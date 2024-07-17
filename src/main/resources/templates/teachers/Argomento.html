@@ -2,1096 +2,1206 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<link rel="shortcut icon" href="/images/wikitel.png" />
-<title>Wikitel</title>
-<meta charset="utf-8">
-<script type="module" src="/js/ws_setup.js"></script>
+    <link rel="shortcut icon" href="/images/wikitel.png"/>
+    <title>Wikitel</title>
+    <meta charset="utf-8">
+    <script type="module" src="/js/ws_setup.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.4/css/select.dataTables.min.css">
-	<link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css">
-		
-  
-<script	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	
-	<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
-<script	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-
-  
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">		
-	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
- <link
-  href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/5.0.0/mdb.min.css"
-  rel="stylesheet"
-/>
-
- <script src="https://d3js.org/d3.v4.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/d3-dispatch@3"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3-quadtree@3"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3-timer@3"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3-force@3"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.4/css/select.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css">
 
 
-	 
-		<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-		<script src="/webjars/stomp-websocket/stomp.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+            integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/5.0.0/mdb.min.css"
+            rel="stylesheet"
+    />
+
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-dispatch@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-quadtree@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-timer@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-force@3"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <script
             type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.9/standalone/umd/vis-network.min.js"
     ></script>
-	<script src="https://kit.fontawesome.com/ced3f913ea.js" crossorigin="anonymous"></script>
-	<script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
-	
-	
-	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-	<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-	<script src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
-	
-		<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <script src="https://kit.fontawesome.com/ced3f913ea.js" crossorigin="anonymous"></script>
+    <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
 
-	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-		<script type="text/javascript" src="/js/Argomento.js"></script>
-		<script   type="text/javascript" src="/js/d3.js" ></script>
-		
-		<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100" rel="stylesheet" />
-		<link th:href="@{/css/teacher_index.css}" rel="stylesheet">
-		<link th:href="@{/css/hello.css}" rel="stylesheet">
-		<link th:href="@{/css/argomento.css}" rel="stylesheet">
-		<link th:href="@{/css/loader.css}" rel="stylesheet">
-		
-		  <link  rel="stylesheet"   href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
-		
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script type="text/javascript" src="/js/Argomento.js"></script>
+    <script type="text/javascript" src="/js/d3.js"></script>
+    <script type="text/javascript" src="/js/ArgomentoGoal.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100" rel="stylesheet"/>
+    <link th:href="@{/css/teacher_index.css}" rel="stylesheet">
+    <link th:href="@{/css/hello.css}" rel="stylesheet">
+    <link th:href="@{/css/argomento.css}" rel="stylesheet">
+    <link th:href="@{/css/loader.css}" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+
 </head>
 <style>
-#toast-container>div {
-font-size: 20px;
-}
-.table_modal{
-	    max-width: 676px;
-}
-#mynetwork {
-  width: 100%;
-  height: 85%;
-}
-.modal-option{
-	width: 76%;
-    max-width: none;
-    
-}
+    #toast-container > div {
+        font-size: 20px;
+    }
 
-.chip img {
-  float: left;
-  margin: 0 10px 0 -25px;
-  height: 50px;
-  width: 50px;
-  border-radius: 50%;
-}
-.closebtn:hover {
-    color: #000;
-}
+    .table_modal {
+        max-width: 676px;
+    }
 
-.closebtn {
-  padding-left: 10px;
-  color: #888;
-  font-weight: bold;
-  float: right;
-  font-size: 20px;
-  cursor: pointer;
-}
-ul.ui-autocomplete {
-    z-index: 1100;
-}
-body{
-	font-family: 'Ubuntu', sans-serif;
-}
+    #mynetwork {
+        width: 100%;
+        height: 85%;
+    }
 
-.none{
-	border:solid .5px #ced4da;
-}
+    .modal-option {
+        width: 76%;
+        max-width: none;
 
-.chip {
-  display: inline-block;
-  padding: 0 25px;
-  height: 50px;
-  font-size: 16px;
-  line-height: 50px;
-  border-radius: 25px;
-  background-color: #f1f1f1;
-      margin-bottom: 2%;
-    margin-right: 2%;
-}
+    }
 
-.links line {
-  stroke: #999;
-  stroke-opacity: 0.6;
-}
+    .chip img {
+        float: left;
+        margin: 0 10px 0 -25px;
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+    }
 
-.nodes circle {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
+    .closebtn:hover {
+        color: #000;
+    }
 
-text {
-  font-family: sans-serif;
-  font-size: 10px;
-}
-.modal-fullscreen .modal-body {
-    overflow-y: hidden!important;
-}
+    .closebtn {
+        padding-left: 10px;
+        color: #888;
+        font-weight: bold;
+        float: right;
+        font-size: 20px;
+        cursor: pointer;
+    }
 
-.toggler-wrapper.style-20 {
-  width: 268px;
-  text-align: center;
-}
+    ul.ui-autocomplete {
+        z-index: 1100;
+    }
+
+    body {
+        font-family: 'Ubuntu', sans-serif;
+    }
+
+    .none {
+        border: solid .5px #ced4da;
+    }
+
+    .chip {
+        display: inline-block;
+        padding: 0 25px;
+        height: 50px;
+        font-size: 16px;
+        line-height: 50px;
+        border-radius: 25px;
+        background-color: #f1f1f1;
+        margin-bottom: 2%;
+        margin-right: 2%;
+    }
+
+    .links line {
+        stroke: #999;
+        stroke-opacity: 0.6;
+    }
+
+    .nodes circle {
+        stroke: #fff;
+        stroke-width: 1.5px;
+    }
+
+    text {
+        font-family: sans-serif;
+        font-size: 10px;
+    }
+
+    .modal-fullscreen .modal-body {
+        overflow-y: hidden !important;
+    }
+
+    .toggler-wrapper.style-20 {
+        width: 268px;
+        text-align: center;
+    }
 
 
+    .toggler-wrapper.style-20 input[type="checkbox"]:checked + .toggler-slider .toggler-knob:before {
+        opacity: 0.4;
+    }
 
-.toggler-wrapper.style-20 input[type="checkbox"]:checked+.toggler-slider .toggler-knob:before {
-  opacity: 0.4;
-}
+    .toggler-wrapper.style-20 input[type="checkbox"]:checked + .toggler-slider .toggler-knob:after {
+        opacity: 1;
+    }
 
-.toggler-wrapper.style-20 input[type="checkbox"]:checked+.toggler-slider .toggler-knob:after {
-  opacity: 1;
-}
+    .toggler-wrapper.style-20 .toggler-slider {
+        background-color: #eb4f37;
+    }
 
-.toggler-wrapper.style-20 .toggler-slider {
-  background-color: #eb4f37;
-}
+    .toggler-wrapper.style-20 .toggler-knob {
+        position: relative;
+        height: 100%;
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 210px;
+        display: inline-block;
+        left: -2px;
+    }
 
-.toggler-wrapper.style-20 .toggler-knob {
-  position: relative;
-  height: 100%;
-  background-repeat: no-repeat;
-  background-position: center;
-  width: 210px;
-  display: inline-block;
-  left: -2px;
-}
+    .toggler-wrapper.style-20 .toggler-knob:before {
+        content: 'Tutti i link';
+        position: absolute;
+        top: 50%;
+        left: -20px;
+        -webkit-transform: translateY(-50%);
+        transform: translateY(-50%);
+        font-size: 75%;
+        text-transform: uppercase;
+        font-weight: 500;
+        color: white;
+    }
 
-.toggler-wrapper.style-20 .toggler-knob:before {
-  content: 'Tutti i link';
-  position: absolute;
-  top: 50%;
-  left: -20px;
-  -webkit-transform: translateY(-50%);
-  transform: translateY(-50%);
-  font-size: 75%;
-  text-transform: uppercase;
-  font-weight: 500;
-  color: white;
-}
+    .toggler-wrapper.style-20 .toggler-knob:after {
+        content: 'Percorso selezionato';
+        position: absolute;
+        top: 50%;
+        right: -23px;
+        -webkit-transform: translateY(-50%);
+        transform: translateY(-50%);
+        font-size: 75%;
+        text-transform: uppercase;
+        font-weight: 500;
+        color: white;
+        opacity: 0.4;
+    }
 
-.toggler-wrapper.style-20 .toggler-knob:after {
-  content: 'Percorso selezionato';
-  position: absolute;
-  top: 50%;
-  right: -23px;
-  -webkit-transform: translateY(-50%);
-  transform: translateY(-50%);
-  font-size: 75%;
-  text-transform: uppercase;
-  font-weight: 500;
-  color: white;
-  opacity: 0.4;
-}
+    .toggler-wrapper {
+        display: block;
+        width: 45px;
+        height: 35px;
+        cursor: pointer;
+        position: relative;
+    }
 
-.toggler-wrapper {
-  display: block;
-  width: 45px;
-  height: 35px;
-  cursor: pointer;
-  position: relative;
-}
+    .toggler-wrapper input[type="checkbox"] {
+        display: none;
+    }
 
-.toggler-wrapper input[type="checkbox"] {
-  display: none;
-}
+    .toggler-wrapper input[type="checkbox"]:checked + .toggler-slider {
+        background-color: #44cc66;
+    }
 
-.toggler-wrapper input[type="checkbox"]:checked+.toggler-slider {
-  background-color: #44cc66;
-}
+    .toggler-wrapper .toggler-slider {
+        background-color: #ccc;
+        position: absolute;
+        border-radius: 100px;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        -webkit-transition: all 300ms ease;
+        transition: all 300ms ease;
+    }
 
-.toggler-wrapper .toggler-slider {
-  background-color: #ccc;
-  position: absolute;
-  border-radius: 100px;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  -webkit-transition: all 300ms ease;
-  transition: all 300ms ease;
-}
+    .toggler-wrapper .toggler-knob {
+        position: absolute;
+        -webkit-transition: all 300ms ease;
+        transition: all 300ms ease;
+    }
 
-.toggler-wrapper .toggler-knob {
-  position: absolute;
-  -webkit-transition: all 300ms ease;
-  transition: all 300ms ease;
-}
-.stage{
-  max-width:80%;margin:60px 10%;
-  position:relative;  
-}
-.tile{
-    border-radius: 3px;
-    display:inline-block;
-    margin-bottom: 23px;
-    text-align: center;
-    border: 1px solid #eeeeee;
-    transition: 0.2s all cubic-bezier(0.4, 0.0, 0.2, 1);
-    position: relative;
-    padding: 35px 16px 25px;
-    margin-right: 17px;
-    cursor: pointer;
-}
-.tile:hover{
-  box-shadow: 0px 7px 5px -6px rgba(0, 0, 0, 0.12);
-}
-.tile i{
-    color: #00A8FF;
-    height: 55px;
-    margin-bottom: 20px;
-    font-size: 55px;
-    display: block;
-    line-height: 54px;
-    cursor: pointer;
-}
-.tile i.mdi-file-document{
-  color:#8fd9ff;
-}
+    .stage {
+        max-width: 80%;
+        margin: 60px 10%;
+        position: relative;
+    }
 
-.card-title{  
-  font-size:15px;
-  transition:1s;
-  cursor:pointer;
-}
-.card-title i{  
-  font-size:15px;
-  transition:1s;
-  cursor:pointer;
-  color:#ffa710
-}
-.card-title i:hover{
-  transform: scale(1.25) rotate(100deg); 
-  color:#18d4ca;
-  
-}
-.c-details span {
-    font-weight: 300;
-    font-size: 13px
-}
+    .tile {
+        border-radius: 3px;
+        display: inline-block;
+        margin-bottom: 23px;
+        text-align: center;
+        border: 1px solid #eeeeee;
+        transition: 0.2s all cubic-bezier(0.4, 0.0, 0.2, 1);
+        position: relative;
+        padding: 35px 16px 25px;
+        margin-right: 17px;
+        cursor: pointer;
+    }
 
-.icon {
-    width: 50px;
-    height: 50px;
-    background-color: #eee;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 39px
-}
+    .tile:hover {
+        box-shadow: 0px 7px 5px -6px rgba(0, 0, 0, 0.12);
+    }
 
-.badge span {
-    background-color: #fffbec;
-    width: 60px;
-    height: 25px;
-    padding-bottom: 3px;
-    border-radius: 5px;
-    display: flex;
-    color: #fed85d;
-    justify-content: center;
-    align-items: center
-}
+    .tile i {
+        color: #00A8FF;
+        height: 55px;
+        margin-bottom: 20px;
+        font-size: 55px;
+        display: block;
+        line-height: 54px;
+        cursor: pointer;
+    }
 
-.progress {
-    height: 10px;
-    border-radius: 10px
-}
+    .tile i.mdi-file-document {
+        color: #8fd9ff;
+    }
 
-.progress div {
-    background-color: red
-}
+    .card-title {
+        font-size: 15px;
+        transition: 1s;
+        cursor: pointer;
+    }
 
-.text1 {
-    font-size: 14px;
-    font-weight: 600
-}
+    .card-title i {
+        font-size: 15px;
+        transition: 1s;
+        cursor: pointer;
+        color: #ffa710
+    }
 
-.text2 {
-    color: #a5aec0
-}
-.tooltips {
-  
-  position: relative;
-  display: inline-block;
-}
+    .card-title i:hover {
+        transform: scale(1.25) rotate(100deg);
+        color: #18d4ca;
 
-/* Tooltip text */
-.tooltiptext {
-	text-transform: none;
-  visibility: hidden;
-  width: 120px;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  padding: 5px 0;
-  border-radius: 6px;
- 
-  /* Position the tooltip text - see examples below! */
-  position: absolute;
-  z-index: 1;
-  width: 130px;
-  padding: 2px;
-  top: 120%;
-  left: 50%;
-  margin-left: -64px;
-}
+    }
 
-.tooltips .tooltiptext::after {
-  content: " ";
-  position: absolute;
-  bottom: 100%;  /* At the top of the tooltip */
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: transparent transparent black transparent;
-}
+    .c-details span {
+        font-weight: 300;
+        font-size: 13px
+    }
 
-/* Show the tooltip text when you mouse over the tooltip container */
-.tooltips:hover .tooltiptext {
-  visibility: visible;
-}
-.flexing {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    .icon {
+        width: 50px;
+        height: 50px;
+        background-color: #eee;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 39px
+    }
 
-#loadingBar {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(200, 200, 200, 0.8);
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -ms-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  transition: all 0.5s ease;
-  opacity: 1;
-}
-#wrapper {
-  position: relative;
-  width: 900px;
-  height: 900px;
-}
+    .badge span {
+        background-color: #fffbec;
+        width: 60px;
+        height: 25px;
+        padding-bottom: 3px;
+        border-radius: 5px;
+        display: flex;
+        color: #fed85d;
+        justify-content: center;
+        align-items: center
+    }
 
-#text {
-  position: absolute;
-  top: 50%;
-  left: 100%;
-  transform: translate(-50%, -50%);
-  margin: auto auto auto auto;
-  font-size: 22px;
-  color: #000000;
-}
+    .progress {
+        height: 10px;
+        border-radius: 10px
+    }
 
-div.outerBorder {
-  position: relative;
-  top: 400px;
-  width: 600px;
-  height: 44px;
-  margin: auto auto auto auto;
-  border: 8px solid rgba(0, 0, 0, 0.1);
- 
-  border-radius: 72px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-}
+    .progress div {
+        background-color: red
+    }
 
-#border {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 500px;
-  height: 23px;
-  margin: auto auto auto auto;
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-}
+    .text1 {
+        font-size: 14px;
+        font-weight: 600
+    }
 
-#bar {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 20px;
-  height: 20px;
-  margin: auto auto auto auto;
-  border-radius: 11px;
-  border: 2px solid rgba(30, 30, 30, 0.05);
-  background: rgb(0, 173, 246); /* Old browsers */
-  box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.4);
-}
+    .text2 {
+        color: #a5aec0
+    }
 
-.first_time {
-    padding: 2.5rem 2.222rem;
-    border: 1px solid #3b71ca;
-    position: relative;
-    margin: 1.75rem 0 1rem;
-    border-radius: 8px;
-    text-align: center;
-}
-.first_time .callout-title {
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 1rem;
-    margin-right: 2.222rem;
-    letter-spacing: .06rem;
-    color: #5b6f82;
-}
-.first_time:not(.callout-highlight):not(.callout-more) .callout-title {
-    position: absolute;
-    font-size: 1rem;
-    padding: 0 1.389rem;
-    background: #fff;
-    top: -0.78em;
-    left: 50%;
--webkit-transform: translateX(-50%);
-transform: translateX(-50%)
-}
-.tgl {
-  display: none;
-}
-.tgl, .tgl:after, .tgl:before, .tgl *, .tgl *:after, .tgl *:before, .tgl + .tgl-btn {
-  box-sizing: border-box;
-}
-.tgl::-moz-selection, .tgl:after::-moz-selection, .tgl:before::-moz-selection, .tgl *::-moz-selection, .tgl *:after::-moz-selection, .tgl *:before::-moz-selection, .tgl + .tgl-btn::-moz-selection {
-  background: none;
-}
-.tgl::selection, .tgl:after::selection, .tgl:before::selection, .tgl *::selection, .tgl *:after::selection, .tgl *:before::selection, .tgl + .tgl-btn::selection {
-  background: none;
-}
-.tgl + .tgl-btn {
-  outline: 0;
-  display: block;
-  width: 4em;
-  height: 2em;
-  position: relative;
-  cursor: pointer;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-}
-.tgl + .tgl-btn:after, .tgl + .tgl-btn:before {
-  position: relative;
-  display: block;
-  content: "";
-  width: 50%;
-  height: 100%;
-}
-.tgl + .tgl-btn:after {
-  left: 0;
-}
-.tgl + .tgl-btn:before {
-  display: none;
-}
-.tgl:checked + .tgl-btn:after {
-  left: 50%;
-}
+    .tooltips {
 
-.tgl-light + .tgl-btn {
-  background: #f0f0f0;
-  border-radius: 2em;
-  padding: 2px;
-  transition: all 0.4s ease;
-}
-.tgl-light + .tgl-btn:after {
-  border-radius: 50%;
-  background: #fff;
-  transition: all 0.2s ease;
-}
-.tgl-light:checked + .tgl-btn {
-  background: #9FD6AE;
-}
-.tgl-skewed + .tgl-btn {
-	width: 300px;
-  overflow: hidden;
-  transform: skew(-10deg);
-  -webkit-backface-visibility: hidden;
-          backface-visibility: hidden;
-  transition: all 0.2s ease;
-  font-family: sans-serif;
-  background: #3b71ca;
-}
-.tgl-skewed + .tgl-btn:after, .tgl-skewed + .tgl-btn:before {
-  transform: skew(10deg);
-  display: inline-block;
-  transition: all 0.2s ease;
-  width: 100%;
-  text-align: center;
-  position: absolute;
-  line-height: 2em;
-  font-weight: bold;
-  color: #fff;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
-}
-.tgl-skewed + .tgl-btn:after {
-  left: 100%;
-  content: attr(data-tg-on);
-}
-.tgl-skewed + .tgl-btn:before {
-  left: 0;
-  content: attr(data-tg-off);
-}
-.tgl-skewed + .tgl-btn:active {
-  background: #888;
-}
-.tgl-skewed + .tgl-btn:active:before {
-  left: -10%;
-}
-.tgl-skewed:checked + .tgl-btn {
-  background: #0e5a1a;
-}
-.tgl-skewed:checked + .tgl-btn:before {
-  left: -100%;
-}
-.tgl-skewed:checked + .tgl-btn:after {
-  left: 0;
-}
-.tgl-skewed:checked + .tgl-btn:active:after {
-  left: 10%;
-}
-.asinc,.sinc{
-    position: absolute;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
-    font-size: 15px;
-    font-weight: bold;
-}
+        position: relative;
+        display: inline-block;
+    }
 
+    /* Tooltip text */
+    .tooltiptext {
+        text-transform: none;
+        visibility: hidden;
+        width: 120px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 6px;
+
+        /* Position the tooltip text - see examples below! */
+        position: absolute;
+        z-index: 1;
+        width: 130px;
+        padding: 2px;
+        top: 120%;
+        left: 50%;
+        margin-left: -64px;
+    }
+
+    .tooltips .tooltiptext::after {
+        content: " ";
+        position: absolute;
+        bottom: 100%; /* At the top of the tooltip */
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent transparent black transparent;
+    }
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .tooltips:hover .tooltiptext {
+        visibility: visible;
+    }
+
+    .flexing {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #loadingBar {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(200, 200, 200, 0.8);
+        -webkit-transition: all 0.5s ease;
+        -moz-transition: all 0.5s ease;
+        -ms-transition: all 0.5s ease;
+        -o-transition: all 0.5s ease;
+        transition: all 0.5s ease;
+        opacity: 1;
+    }
+
+    #wrapper {
+        position: relative;
+        width: 900px;
+        height: 900px;
+    }
+
+    #text {
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        transform: translate(-50%, -50%);
+        margin: auto auto auto auto;
+        font-size: 22px;
+        color: #000000;
+    }
+
+    div.outerBorder {
+        position: relative;
+        top: 400px;
+        width: 600px;
+        height: 44px;
+        margin: auto auto auto auto;
+        border: 8px solid rgba(0, 0, 0, 0.1);
+
+        border-radius: 72px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    #border {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 500px;
+        height: 23px;
+        margin: auto auto auto auto;
+        box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+
+    #bar {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 20px;
+        height: 20px;
+        margin: auto auto auto auto;
+        border-radius: 11px;
+        border: 2px solid rgba(30, 30, 30, 0.05);
+        background: rgb(0, 173, 246); /* Old browsers */
+        box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .first_time {
+        padding: 2.5rem 2.222rem;
+        border: 1px solid #3b71ca;
+        position: relative;
+        margin: 1.75rem 0 1rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .first_time .callout-title {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 1rem;
+        margin-right: 2.222rem;
+        letter-spacing: .06rem;
+        color: #5b6f82;
+    }
+
+    .first_time:not(.callout-highlight):not(.callout-more) .callout-title {
+        position: absolute;
+        font-size: 1rem;
+        padding: 0 1.389rem;
+        background: #fff;
+        top: -0.78em;
+        left: 50%;
+        -webkit-transform: translateX(-50%);
+        transform: translateX(-50%)
+    }
+
+    .tgl {
+        display: none;
+    }
+
+    .tgl, .tgl:after, .tgl:before, .tgl *, .tgl *:after, .tgl *:before, .tgl + .tgl-btn {
+        box-sizing: border-box;
+    }
+
+    .tgl::-moz-selection, .tgl:after::-moz-selection, .tgl:before::-moz-selection, .tgl *::-moz-selection, .tgl *:after::-moz-selection, .tgl *:before::-moz-selection, .tgl + .tgl-btn::-moz-selection {
+        background: none;
+    }
+
+    .tgl::selection, .tgl:after::selection, .tgl:before::selection, .tgl *::selection, .tgl *:after::selection, .tgl *:before::selection, .tgl + .tgl-btn::selection {
+        background: none;
+    }
+
+    .tgl + .tgl-btn {
+        outline: 0;
+        display: block;
+        width: 4em;
+        height: 2em;
+        position: relative;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .tgl + .tgl-btn:after, .tgl + .tgl-btn:before {
+        position: relative;
+        display: block;
+        content: "";
+        width: 50%;
+        height: 100%;
+    }
+
+    .tgl + .tgl-btn:after {
+        left: 0;
+    }
+
+    .tgl + .tgl-btn:before {
+        display: none;
+    }
+
+    .tgl:checked + .tgl-btn:after {
+        left: 50%;
+    }
+
+    .tgl-light + .tgl-btn {
+        background: #f0f0f0;
+        border-radius: 2em;
+        padding: 2px;
+        transition: all 0.4s ease;
+    }
+
+    .tgl-light + .tgl-btn:after {
+        border-radius: 50%;
+        background: #fff;
+        transition: all 0.2s ease;
+    }
+
+    .tgl-light:checked + .tgl-btn {
+        background: #9FD6AE;
+    }
+
+    .tgl-skewed + .tgl-btn {
+        width: 300px;
+        overflow: hidden;
+        transform: skew(-10deg);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        transition: all 0.2s ease;
+        font-family: sans-serif;
+        background: #3b71ca;
+    }
+
+    .tgl-skewed + .tgl-btn:after, .tgl-skewed + .tgl-btn:before {
+        transform: skew(10deg);
+        display: inline-block;
+        transition: all 0.2s ease;
+        width: 100%;
+        text-align: center;
+        position: absolute;
+        line-height: 2em;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .tgl-skewed + .tgl-btn:after {
+        left: 100%;
+        content: attr(data-tg-on);
+    }
+
+    .tgl-skewed + .tgl-btn:before {
+        left: 0;
+        content: attr(data-tg-off);
+    }
+
+    .tgl-skewed + .tgl-btn:active {
+        background: #888;
+    }
+
+    .tgl-skewed + .tgl-btn:active:before {
+        left: -10%;
+    }
+
+    .tgl-skewed:checked + .tgl-btn {
+        background: #0e5a1a;
+    }
+
+    .tgl-skewed:checked + .tgl-btn:before {
+        left: -100%;
+    }
+
+    .tgl-skewed:checked + .tgl-btn:after {
+        left: 0;
+    }
+
+    .tgl-skewed:checked + .tgl-btn:active:after {
+        left: 10%;
+    }
+
+    .asinc, .sinc {
+        position: absolute;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        font-size: 15px;
+        font-weight: bold;
+    }
 </style>
 <script>
-function openNav() {
-	if(document.getElementById("mySidebar").style.width == "250px"){
-   document.getElementById("mySidebar").style.width = "0";
-  document.getElementById("main").style.marginLeft= "0";
-  }else{
-	 document.getElementById("mySidebar").style.width = "250px";
-  document.getElementById("main").style.marginLeft = "250px";
-}
-}
+    function openNav() {
+        if (document.getElementById("mySidebar").style.width == "250px") {
+            document.getElementById("mySidebar").style.width = "0";
+            document.getElementById("main").style.marginLeft = "0";
+        } else {
+            document.getElementById("mySidebar").style.width = "250px";
+            document.getElementById("main").style.marginLeft = "250px";
+        }
+    }
 
+    function coloraQuadrato() {
+        var quadrato = document.getElementById('quadrato');
+        var coloreCasuale = '#' + Math.floor(Math.random() * 16777215).toString(16);
+        quadrato.style.backgroundColor = coloreCasuale;
+    }
 
 </script>
-<body  >
+<body>
 
 
 </div>
-<div hidden="true" id="nameid" th:value="${user.id}"> </div>
-<div hidden="true" id="modelid" th:value="${model}"> </div>
-<nav class="navbar navbar-expand-lg navbar-light bg-light" style="z-index: 1030;padding: 15PX 15px;display:flex;justify-content: space-between;">
-	<span style="font-size:25px;cursor:pointer;margin-right: 2%;" onclick="openNav()"><i class="fas fa-bars"></i></span>
-	<div>
-  <a class="navbar-brand" href="/default"><img src="/images/wikitel.png" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy">
-                WikiTEL</a>
-	</div>
-	<div class="d-flex">
-	
-<div class="dropdown-container" style="position: relative;">
-<button type="button" class="btn btn-info dropdown-toggle" style="margin-right: 2px;" data-bs-toggle="dropdown" aria-expanded="false">
-   <span class="spinner-border spinner-border-sm text-primary" style="display: none;" id="ricerca_obiettivi" role="status" aria-hidden="true"></span>
-  <span >Ricerca obiettivi</span>
-  </button>
-<div class="dropdown-menu dropdown-menu-end  p-4 " style="max-width: 300px;position: absolute;" >
-	
- <ul class="list-group list-group-light" id="Search_container">
- <p class="text-muted">Nessun elemento in ricerca</p>
-</ul>
-</div>
-</div>
-  <button class="btn btn-primary dropdown-toggle" style="margin-top: auto;margin-bottom: auto;" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-    <i class="fas fa-user"></i>
-  </button>
-  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
-    <li><a class="dropdown-item" th:href="@{/profile}">Profile</a></li>
-    <li> <a class="dropdown-item" type="button" th:href="@{/logout}"><i style="color: red;" class="fas fa-sign-out-alt"></i> Sign Out</a></li>
-  </ul>
-	</div>
+<div hidden="true" id="nameid" th:value="${user.id}"></div>
+<div hidden="true" id="modelid" th:value="${model}"></div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light"
+     style="z-index: 1030;padding: 15PX 15px;display:flex;justify-content: space-between;">
+    <span style="font-size:25px;cursor:pointer;margin-right: 2%;" onclick="openNav()"><i class="fas fa-bars"></i></span>
+    <div>
+        <a class="navbar-brand" href="/default"><img src="/images/wikitel.png" width="30" height="30"
+                                                     class="d-inline-block align-top" alt="" loading="lazy">
+            WikiTEL</a>
+    </div>
+    <div class="d-flex">
+
+        <div class="dropdown-container" style="position: relative;">
+            <button type="button" class="btn btn-info dropdown-toggle" style="margin-right: 2px;"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="spinner-border spinner-border-sm text-primary" style="display: none;"
+                      id="ricerca_obiettivi" role="status" aria-hidden="true"></span>
+                <span>Ricerca obiettivi</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end  p-4 " style="max-width: 300px;position: absolute;">
+
+                <ul class="list-group list-group-light" id="Search_container">
+                    <p class="text-muted">Nessun elemento in ricerca</p>
+                </ul>
+            </div>
+        </div>
+        <button class="btn btn-primary dropdown-toggle" style="margin-top: auto;margin-bottom: auto;" type="button"
+                id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" th:href="@{/profile}">Profile</a></li>
+            <li><a class="dropdown-item" type="button" th:href="@{/logout}"><i style="color: red;"
+                                                                               class="fas fa-sign-out-alt"></i> Sign Out</a>
+            </li>
+        </ul>
+    </div>
 </nav>
 <div id="mySidebar" class="sidebar">
-  <a href="#">Dashboard</a>
-  <a href="#">Calendar</a>
-  
-   <a  data-bs-toggle="collapse" href="#collapse" role="button" aria-expanded="false" aria-controls="collapseExample">
-    I miei corsi
-  </a>
-  <div class="collapse" id="collapse">
-  <div class="card card-body" id="side-bar" th:each="m : ${lesson}"><a style="font-size: 19px;" th:text="${m.name}"th:href="'/lezione/' + ${m.id} "></a></div>
+    <a href="#">Dashboard</a>
+    <a href="#">Calendar</a>
+
+    <a data-bs-toggle="collapse" href="#collapse" role="button" aria-expanded="false" aria-controls="collapseExample">
+        I miei corsi
+    </a>
+    <div class="collapse" id="collapse">
+        <div class="card card-body" id="side-bar" th:each="m : ${lesson}"><a style="font-size: 19px;"
+                                                                             th:text="${m.name}"
+                                                                             th:href="'/lezione/' + ${m.id} "></a></div>
+    </div>
 </div>
-</div>
- <div id="main">
- 	<div class="first_time">
-	<div class="callout-title"> Argomento del corso</div>
-	
-	<strong class="h2" th:text="${name}"></strong>
-	</div>
- <button type="button" class="btn btn-primary tooltips" data-bs-toggle="modal" data-bs-target="#new-lesson-modal"><span class="tooltiptext">Crea una nuova lezione di questo modello</span>Crea una nuova lezione</button>
- 
+<div id="main">
+    <div class="first_time">
+        <div class="callout-title"> Argomento del corso</div>
 
-<button type="button" class="btn btn-primary tooltips" data-bs-toggle="modal" data-bs-target="#graph"><span class="tooltiptext">Visualizzazione del modello in formato grafico</span>
-  Edit Path  <span><i class="fas fa-project-diagram"></i></span>
-</button>
+        <strong class="h2" th:text="${name}"></strong>
+    </div>
+    <button type="button" class="btn btn-primary tooltips" data-bs-toggle="modal" data-bs-target="#new-lesson-modal">
+        <span class="tooltiptext">Crea una nuova lezione di questo modello</span>Crea una nuova lezione
+    </button>
 
 
-<div class="container mt-5 mb-3">
-    <div class="row" id="row">
-        <div class="col-md-4" th:each="m : ${lesson}" th:id="${m.getId()}">
-            <div class="card cardv p-3 mb-2">
-                <div class="d-flex justify-content-between">
-                    <div class="d-flex flex-row align-items-center">
-                        <div class="icon"> <i class="bx bxl-mailchimp"></i> </div>
-                        <div class="ms-2 c-details">
-                            <h6 class="mb-0" th:text="${m.model.name}"></h6> N° Studenti: <span th:text="${m.getFollowed_by().size()}"></span>
+    <button type="button" class="btn btn-primary tooltips" data-bs-toggle="modal" data-bs-target="#graph"><span
+            class="tooltiptext">Visualizzazione del modello in formato grafico</span>
+        Edit Path <span><i class="fas fa-project-diagram"></i></span>
+    </button>
+
+
+    <div class="container mt-5 mb-3">
+        <div class="row" id="row">
+            <div class="col-md-4" th:each="m : ${lesson}" th:id="${m.getId()}">
+                <div class="card cardv p-3 mb-2">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex flex-row align-items-center">
+                            <div class="icon"><i class="bx bxl-mailchimp"></i></div>
+                            <div class="ms-2 c-details">
+                                <h6 class="mb-0" th:text="${m.model.name}"></h6> N° Studenti: <span
+                                    th:text="${m.getFollowed_by().size()}"></span>
+                            </div>
                         </div>
-                    </div><button type="button" id="but_conf" class="btn btn-link config" style="border:none;color:black;" th:attr="onclick=|lessionopt('${m.getId()}')|" data-bs-toggle="modal" data-bs-target="#lezioneopt"   ><i class="fas fa-cog"></i></button>
-              
+                        <button type="button" id="but_conf" class="btn btn-link config" style="border:none;color:black;"
+                                th:attr="onclick=|lessionopt('${m.getId()}')|" data-bs-toggle="modal"
+                                data-bs-target="#lezioneopt"><i class="fas fa-cog"></i></button>
+
+                    </div>
+                    <div class="mt-4">
+                        <a style="font-size: 25px;" class="h2" th:href="@{'/lezione/' +${m.id}} "
+                           th:text="${m.name}"></a>
+                        <div class="mt-5">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0"
+                                     aria-valuemax="100"></div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
-                <div class="mt-4">
-                    <a style="font-size: 25px;" class="h2" th:href="@{'/lezione/' +${m.id}} " th:text="${m.name}"></a>
-                    <div class="mt-5">
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar"  aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="graph" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header row justify-content-end">
+                    <div class="spinner-grow text-primary" role="status" style="display: none;" id="graph_search">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <strong class="col-4 text-center h4" th:text="${arg.getName()}"></strong>
+
+                    <div class="col-4" style="    text-align: end;
+">
+                        <button type="button" class="btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="row justify-content-between">
+                        <div class="col-auto me-auto">
+                            <button type="button" class="btn btn-primary tooltips" data-bs-toggle="modal"
+                                    data-bs-target="#table_modal">TABELLA
+                            </button>
                         </div>
-                        
+                        <div class="col-auto">
+                            <input class="tgl tgl-skewed" id="only_rule" onchange="filter_rule()" type="checkbox"/>
+                            <label class="tgl-btn" data-tg-off="VAI AL PERCORSO SELEZIONATO"
+                                   data-tg-on="GUARDA TUTTI I LINK" for="only_rule"></label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="row" style="margin-top: 11px;">
+                            <div class="col-md-11">Questa è una versione grafica dei<strong> link più affini </strong>al
+                                tuo obiettivo. Trascinando la pallina blu a sinistra o a destra vedrai più o meno nodi.
+                                Se vuoi esplorarli in forma tabellare seleziona <strong>TABELLA </strong> in alto a
+                                destra.
+                            </div>
+                            <a class="col-md-1 tooltips" align="center" data-bs-toggle="modal" href="#graph_legend"
+                               role="button">
+                                <span class="tooltiptext">Legenda simboli del grafo</span>
+                                <i class="fas fa-question-circle fa-2x"></i>
+                            </a></div>
+                        <div class="row">
+                            <div class="col-auto me-auto">TUTTI I NODI</div>
+                            <div class="col-auto">NODI PIU' RILEVANTI</div>
+                        </div>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0" max="100" value="70" id="slider"/>
+                            <span id="range_input"></span>
+                        </div>
+                    </div>
+
+                    <div id="optionsContainer"></div>
+
+                    <div id="mynetwork"></div>
+                    <div id="loadingBar">
+                        <div class="outerBorder">
+                            <div id="text">0%</div>
+                            <div id="border">
+                                <div id="bar"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-   
     </div>
-</div>
 
 
+    <!-- Modal Table -->
+    <div class="modal fade" id="table_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog table_modal">
+            <div class="modal-content" id="table_content">
+                <div class="modal-header">
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <table id="example" class="display" style="width:100%">
+                        <thead>
+                        <tr>
+
+                            <th>Name</th>
+                            <th>Parent</th>
+                            <th>type</th>
+                            <th>affinità</th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+
+                            <th>Name</th>
+                            <th>Parent</th>
+                            <th>type</th>
+                            <th>affinità</th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="MultiSearch()">Aggiungi nodo
+                        selezionato
+                    </button>
+                    <button type="button" class="btn btn-sm btn-primary" style="display: none;" id="try"
+                            onclick="aggiorna()">Visualizza
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nuova lesione -->
+    <div class="modal fade" id="new-lesson-modal" tabindex="-1" aria-labelledby="new-lesson-modal-label"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width:850px;">
+            <div class="modal-content">
+                <form id="new_lesson">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="new-lesson-modal-label">Nuova lezione (<span id="model_name" th:text="${arg.name}" th:value="${arg.id}"
+                                                                                                    ></span> )</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>Tipo erogazione lezione</h6>
+                        <div style="display: flex;justify-content: center">
+                            <div class="lesson_type">
+
+                                <input type="radio" name="selectype" id="option-1" value="0" checked>
+                                <input type="radio" name="selectype" id="option-2" value="1">
+                                <label for="option-1" class="option option-1">
+                                    <div class="dot"></div>
+                                    <span>Sincrono</span>
+                                </label>
+                                <label for="option-2" class="option option-2">
+                                    <div class="dot"></div>
+                                    <span>Asincrono</span>
+                                </label>
 
 
-<div class="modal fade" id="graph" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-fullscreen">
-    <div class="modal-content">
-      <div class="modal-header row justify-content-end">
-       <div class="spinner-grow text-primary" role="status" style="display: none;" id="graph_search">
-  <span class="visually-hidden">Loading...</span>
-</div>
-      <strong class="col-4 text-center h4" th:text="${arg.getName()}"></strong>
-     
-      <div class="col-4" style="    text-align: end;
-">
-        <button type="button" class="btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      </div>
-      <div class="modal-body">
-      <div class="row justify-content-between">
-       <div class="col-auto me-auto">
-         <button type="button" class="btn btn-primary tooltips" data-bs-toggle="modal"   data-bs-target="#table_modal">TABELLA</button>
-       </div>
-        <div class="col-auto">
-         <input class="tgl tgl-skewed" id="only_rule" onchange="filter_rule()" type="checkbox"/>
-    <label class="tgl-btn" data-tg-off="VAI AL PERCORSO SELEZIONATO" data-tg-on="GUARDA TUTTI I LINK" for="only_rule"></label>
+                            </div>
+                        </div>
+                        <hr/>
+
+                        <div class="form-floating my-1">
+                            <input type="text" class="form-controls" id="new-lesson-name" placeholder="Nome">
+
+                        </div>
+                        <span style="color: red;" id="error_name"></span>
+                        <hr/>
+                        <div class="rubrica">
+                            <button type="button" class="btn btn-primary pos" data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal">
+                                Cerca studenti <i class="fas fa-address-book"></i>
+                            </button>
+                            <h6>Studenti</h6></div>
+                        <div class="col">
+                            <div class="list-group row flex-row mx-1" id="new-lesson-students-list">
+                                <div class="form-group">
+
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-controls" id="students"
+                                               placeholder="Inserisci nome studente" aria-label="Recipient's username"
+                                               aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-info" id="add">Aggiungi</button>
+                                        </div>
+                                    </div>
+                                    <span style="color: red;" id="error_student"></span>
+                                    <div class="topics" id="chips" style="max-height:160px;overflow:auto;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr/>
+                        <h6>Obiettivi didattici</h6>
+                        <span style="color: red;" id="error_goal"></span>
+                        <div class="ObbiettiviDidatticiArgomento">
+                            <button class="restore-btn" type="button"> <i class="fas fa-undo"></i> </button>
+                            <div class="goal_container" id="containerGoal">
+                                <div th:each="g : ${goal}" class="goal_box" draggable="true"
+                                     style="background-color: #ff6384;" th:id="${g.id}"><span
+                                        th:text="${g.name}">A</span></div>
+                            </div>
+                            <div class="container_trash" id="trash">
+                                <div class="trash-box">
+                                    <div class="trash"></div>
+                                    <div class="trash-top"></div>
+                                    <div class="trash-btm">
+                                        <div class="trash-lines">
+                                            <div class="trash-line"></div>
+                                            <div class="trash-line"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" onclick="Create_new_lesson()" class="btn btn-primary btn-block mb-4"
+                                id="create-new-lesson">Crea
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal right -->
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog right">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="h5" style="padding: 0 10px;" id="right_title"></p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <button class="btn btn-success" id="button_link" data-bs-toggle="modal"
+                            data-bs-target="#iframe_page" onclick="wiki_link() ">visualizza la pagina Wikipedia <i
+                            class="fab fa-wikipedia-w"></i></button>
+
+                    <div id="Add" style="margin-bottom:24px ;">
+                        <button class="btn btn-primary" id="addnodo" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#Adds" aria-expanded="false" aria-controls="collapseExample"
+                                style="margin-top:1.5%;">
+                            Aggiungi nodo personalizzato <i class="fas fa-plus-circle"></i>
+                        </button>
+                        <div class="collapse" id="Adds">
+                            <div class="card card-body">
+                                <label for="Add_node_name" class="col-form-label">Nome</label>
+                                <input type="text" class="form-control none" id="Add_node_name" placeholder="Nome"
+                                       required>
+                                <span style="color: red;" id="error_name_rule"></span>
+                                <label for="Add_node_time" class="col-form-label">Durata lezione(in minuti)</label>
+                                <input type="number" class="form-control none" id="Add_node_time" placeholder="Time"
+                                       required>
+                                <span style="color: red;" id="error_time"></span>
+                                <label for="new-rule-type" class="col-form-label">Tipo</label>
+                                <select class="form-select" id="new-rule-type" aria-label="Tipo di obiettivo"
+                                        onChange="update()">
+                                    <option value="1">Testo</option>
+                                    <option value="4">File</option>
+                                    <option value="2">Pagina Web</option>
+                                </select>
+                                <div id="url" style="display: none;margin-top: 2%;margin-bottom:2%;">
+                                    <label for="new-rule-url">URL</label>
+                                    <input type="url" class="form-control none" id="Pagina Web" placeholder="URL"><span
+                                        style="color: red;" id="error_web"></span>
+
+                                </div>
+
+                                <div class="form-group" id="textarea" style="margin-top: 2%;">
+                                    <textarea class="form-control none" id="Testo" rows="3"></textarea>
+                                </div>
+                                <span style="color: red;" id="error_add_text"></span>
+                                <div class="mb-3" id="file" style="display: none;">
+                                    <label for="formFile" class="form-label"></label>
+                                    <input class="form-control" type="file" id="formFile">
+                                </div>
+                                <span style="color: red;" id="error_add_file"></span>
+
+                                <button type="button" class="btn btn-primary" onclick="addNode()"
+                                        style="margin-top: 1%;">Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="esploranodo" onclick="esplora()"
+                            style="margin-top: 1%;margin-bottom:24px ;">Aggiungi nodo
+                    </button>
+
+
+                    <button type="button" class="btn btn-danger" id="deleteRule" data-bs-toggle="modal"
+                            style="margin-top: 100px;" data-bs-target="#delete_conf" data-bs-dismiss="modal">Cancella
+                        nodo <span><i class="fas fa-trash-alt"></i></span></button>
+
+                    <div class="form-group" id="textarea1" style="margin-top: 2%;display:none;">
+                        <textarea class="form-control none" id="Testo1" rows="3"></textarea>
+                    </div>
+                    <div class="stage" id="all_files" style="display:none;text-align: center;">
+                        <div class="tile form">
+                            <i class="fas fa-file-alt"></i>
+                            <h3><a id="file_download" style="text-decoration: underline!important;"></a></h3>
+                        </div><!-- .tile.form -->
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal rubrica
+     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-option" role="document">
+        <div class="modal-content cont">
+          <div class="modal-header" style="border-bottom: 0px solid!important">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body flex">
+          <div class="search_bar">
+           <div class="mt-3 inputs"> <i class="fa fa-search"></i> <input type="text" class="form-control " id="search" placeholder="Search Tasks..." onkeyup="searchFunction()"> </div>
+          </div>
+          <div id="root" class="profile_card">
+
+          </div>
+          </div>
+          <div class="modal-footer" style="border-top: 0px solid!important">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" id="Save" class="btn btn-primary">Save changes</button>
+          </div>
         </div>
       </div>
-      <div class="row">
-      <div class="row" style="margin-top: 11px;">
-   <div class="col-md-11" >Questa è una versione grafica dei<strong> link più affini </strong>al tuo obiettivo. Trascinando la pallina blu a sinistra o a destra vedrai più o meno nodi. Se vuoi esplorarli in forma tabellare seleziona <strong>TABELLA </strong> in alto a destra.</div>
-<a class="col-md-1 tooltips" align="center" data-bs-toggle="modal" href="#graph_legend"  role="button" >
-  <span class="tooltiptext">Legenda simboli del grafo</span>
-  <i class="fas fa-question-circle fa-2x"></i>
-</a>      </div>
-   <div class="row">
-	<div class="col-auto me-auto">TUTTI I NODI</div>
-   <div class="col-auto">NODI PIU' RILEVANTI</div>
-   </div>
-<div class="range">
-  <input type="range" class="form-range" value="70" id="customRange1" />
-  <span id="range_input"></span>
-</div>
-      </div>
 
-   <div id="optionsContainer"></div>
+    </div> -->
 
-<div id="mynetwork"></div> <div id="loadingBar">
-    <div class="outerBorder">
-      <div id="text">0%</div>
-      <div id="border">
-        <div id="bar"></div>
-      </div>
-    </div>
-  </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-<!-- Modal Table -->
-<div class="modal fade" id="table_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog table_modal">
-    <div class="modal-content" id="table_content">
-      <div class="modal-header">
-  
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-    
-        <table id="example" class="display" style="width:100%">
-        <thead>
-            <tr>
-               
-                <th>Name</th>
-                <th>Parent</th>
-                <th>type</th>
-                <th>affinità</th>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-               
-                <th>Name</th>
-                <th>Parent</th>
-                <th>type</th>
-                <th>affinità</th>
-            </tr>
-        </tfoot>
-    </table>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-        <button type="button" class="btn btn-sm btn-primary"  onclick="MultiSearch()">Aggiungi nodo selezionato</button>
-         <button type="button" class="btn btn-sm btn-primary" style="display: none;" id="try" onclick="aggiorna()">Visualizza</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Nuova lesione -->
-<div class="modal fade" id="new-lesson-modal" tabindex="-1" aria-labelledby="new-lesson-modal-label" aria-hidden="true">
-   <div class="modal-dialog" role="document">
-      <div class="modal-content">
-         <form id="new_lesson">
-            <div class="modal-header">
-               <h5 class="modal-title" id="new-lesson-modal-label">Nuova lezione</h5>
-               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-               <div class="form-floating my-1">
-                  <div class="col-sm-9 text-secondary">
-                     <div class="name"  >
-                        <p id="model_name" th:text="${arg.name}" th:value="${arg.id}" style="font-size: 1.5em;color: black;"></p>
-                     </div>
-
-                  </div>
-               </div>
-                <h6>Tipo erogazione lezione</h6>
-                <div style="display: flex;justify-content: center">
-                <div class="lesson_type">
-
-                        <input type="radio" name="selectype" id="option-1" value="0" checked>
-                        <input type="radio" name="selectype" id="option-2" value="1">
-                        <label for="option-1" class="option option-1">
-                            <div class="dot"></div>
-                            <span>Sincrono</span>
-                        </label>
-                        <label for="option-2" class="option option-2">
-                            <div class="dot"></div>
-                            <span>Asincrono</span>
-                        </label>
-
-
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 70%!important;">
+            <div class="modal-content">
+                <div class="modal-header" style="border-bottom: 0px solid!important">
+                    <h5 class="modal-title" id="exampleModalLabel" style="text-align: center;">Student List</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                </div>
-                <hr />
+                <div class="modal-body">
+                    <div class="try">
+                        <div class="container-fluid">
+                            <div class="row" id="student-row">
 
-               <div class="form-floating my-1">
-                  <input type="text" class="form-controls" id="new-lesson-name" placeholder="Nome" required>
-                   
-               </div>
-               <span style="color: red;" id="error_name"></span>
-               <hr />
-               <div class="rubrica">
-               <button type="button" class="btn btn-primary pos" data-bs-toggle="modal" data-bs-target="#exampleModal">
- Cerca studenti <i class="fas fa-address-book"></i>
-</button>
-               <h6>Studenti</h6></div>
-               <div class="col" >
-                  <div class="list-group row flex-row mx-1" id="new-lesson-students-list">
-                     <div class="form-group">
-                     
-                        <div class="input-group mb-3">
-                           <input type="text" class="form-controls" id="students" placeholder="Inserisci nome studente" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                           <div class="input-group-append">
-                              <button type="button" class="btn btn-info" id="add" >Aggiungi</button>
-                           </div>
-                        </div>
-                        <span style="color: red;" id="error_student"></span>
-                        <div class="topics" id="chips" style="max-height:160px;overflow:auto;">
-                        </div>
-                     </div>
-                  </div>
-               </div>
-               <hr />
-               <h6>Obiettivi didattici</h6>
-               <span style="color: red;" id="error_goal"></span>
-               <div class="grid" style="display: grid;grid-template-columns: auto auto auto;row-gap: 5px;padding: 5px;" id="lesson_goal">
-                   <div th:each="g : ${goal}" style="    padding-right: 10px;" th:id="${g.id}">
-                            <div class="form-check form-switch col">
-  <input class="form-check-input" type="checkbox" role="switch"  th:value="${g.id}" th:name="${g.name}">
-  <label class="form-check-label" for="flexSwitchCheckDefault" th:text="${g.name}"></label>
-</div>
                             </div>
-               </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
-            <div class="modal-footer">
-               <button type="button" onclick="Create_new_lesson()" class="btn btn-primary btn-block mb-4" id="create-new-lesson">Crea</button>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="lezioneopt" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Categorie obiettivi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalprecondition">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="lessenDelete" data-bs-dismiss="modal">Delete
+                    </button>
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-primary">Close</button>
+                </div>
             </div>
-         </form>
-      </div>
-   </div>
-</div>
- 
-<!-- Modal right -->
-<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog right">
-    <div class="modal-content">
-      <div class="modal-header">
-       	<p class="h5" style="padding: 0 10px;" id="right_title"></p>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-              <button class="btn btn-success" id="button_link" data-bs-toggle="modal" data-bs-target="#iframe_page" onclick="wiki_link() ">visualizza la pagina Wikipedia <i class="fab fa-wikipedia-w"></i></button>
-
-<div id="Add" style="margin-bottom:24px ;">
-      <button class="btn btn-primary" id="addnodo" type="button" data-bs-toggle="collapse" data-bs-target="#Adds" aria-expanded="false" aria-controls="collapseExample" style="margin-top:1.5%;">
-    Aggiungi nodo personalizzato  <i class="fas fa-plus-circle"></i>
-  </button>
-         <div class="collapse" id="Adds">
-  <div class="card card-body">
-  <label for="Add_node_name" class="col-form-label">Nome</label>
-  <input type="text" class="form-control none" id="Add_node_name" placeholder="Nome" required>
-  <span style="color: red;" id="error_name_rule"></span>
-  <label for="Add_node_time" class="col-form-label">Durata lezione(in minuti)</label>
-  <input type="number" class="form-control none" id="Add_node_time" placeholder="Time" required>
-  <span style="color: red;" id="error_time"></span>
-             <label for="new-rule-type" class="col-form-label">Tipo</label>     
-   <select class="form-select" id="new-rule-type" aria-label="Tipo di obiettivo" onChange="update()">
-                     <option value="1">Testo</option>
-                     <option value="4">File</option>
-                     <option value="2">Pagina Web</option>
-                  </select>
-                       <div id="url" style="display: none;margin-top: 2%;margin-bottom:2%;">
-                     <label for="new-rule-url">URL</label>
-                     <input type="url" class="form-control none" id="Pagina Web" placeholder="URL"><span style="color: red;" id="error_web"></span>
-                  
-                  </div>
-          
-                   <div class="form-group" id="textarea" style="margin-top: 2%;">
-    <textarea class="form-control none" id="Testo" rows="3"></textarea>
-  </div><span style="color: red;" id="error_add_text"></span>
-  <div class="mb-3" id="file" style="display: none;">
-  <label for="formFile" class="form-label"></label>
-  <input class="form-control" type="file" id="formFile">
-</div>
-<span style="color: red;" id="error_add_file"></span>
-
-<button type="button" class="btn btn-primary" onclick="addNode()" style="margin-top: 1%;">Add</button>
+        </div>
     </div>
-         </div>
-</div>
-<button type="button" class="btn btn-primary" id="esploranodo" onclick="esplora()" style="margin-top: 1%;margin-bottom:24px ;">Aggiungi nodo</button>
-       
-         
-                	<button type="button" class="btn btn-danger" id="deleteRule" data-bs-toggle="modal" style="margin-top: 100px;" data-bs-target="#delete_conf" data-bs-dismiss="modal" >Cancella nodo  <span><i class="fas fa-trash-alt"></i></span> </button>
 
-             <div class="form-group" id="textarea1" style="margin-top: 2%;display:none;">
-    <textarea class="form-control none" id="Testo1" rows="3"></textarea>
-  </div>
-          <div class="stage" id="all_files" style="display:none;text-align: center;">   
-    <div class="tile form">
-      <i class="fas fa-file-alt"></i>
-      <h3><a id="file_download" style="text-decoration: underline!important;"></a></h3>
-    </div><!-- .tile.form -->
-</div>
-      
-      </div>
-      
-      
-     
-    </div>
-  </div>
-</div>
-
-<!-- Modal rubrica 
- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-option" role="document">
-    <div class="modal-content cont">
-      <div class="modal-header" style="border-bottom: 0px solid!important">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      
-      <div class="modal-body flex">
-      <div class="search_bar">
-       <div class="mt-3 inputs"> <i class="fa fa-search"></i> <input type="text" class="form-control " id="search" placeholder="Search Tasks..." onkeyup="searchFunction()"> </div>
-      </div>
-      <div id="root" class="profile_card">
-        
-      </div>
-      </div>
-      <div class="modal-footer" style="border-top: 0px solid!important">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        <button type="button" id="Save" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-  
-</div> -->
-
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" style="max-width: 70%!important;">
-    <div class="modal-content">
-      <div class="modal-header" style="border-bottom: 0px solid!important">
-        <h5 class="modal-title" id="exampleModalLabel" style="text-align: center;">Student List</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-     <div class="modal-body"><div class="try">
-  <div class="container-fluid">
-    <div class="row" id="student-row">
-    
-    </div>
-    
-  </div>
-  </div>
-</div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal fade" id="lezioneopt" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Categorie obiettivi</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="modalprecondition">
-      
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger"  id="lessenDelete" data-bs-dismiss="modal">Delete</button>
-        <button type="button" data-bs-dismiss="modal" class="btn btn-primary">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="delete_conf" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header" style="border-bottom: none;position: relative;flex-direction: column!important;">
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        <div class="icon-box" style="
+    <div class="modal fade" id="delete_conf" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"
+                     style="border-bottom: none;position: relative;flex-direction: column!important;">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="icon-box" style="
     margin: 0 auto;
     z-index: 9;
     text-align: center;">
-					<i class="fas fa-exclamation-circle fa-5x" style="color: red;"></i>
-				</div>						
-				<h4 class="modal-title w-100" style="text-align: center;    margin: 30px 0 -10px;">Sei sicuro di voler cancellare il nodo?</h4>	
+                        <i class="fas fa-exclamation-circle fa-5x" style="color: red;"></i>
+                    </div>
+                    <h4 class="modal-title w-100" style="text-align: center;    margin: 30px 0 -10px;">Sei sicuro di
+                        voler cancellare il nodo?</h4>
 
-      </div>
-      <div class="modal-body" style="color: #999;text-align: center;font-size: 18px;">
-        <p>Cancellando questo nodo verranno anche cancellati tutti i nodi collegati ad esso.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-target="#myModal">Close</button>
-        <button type="button" class="btn btn-danger" onclick="deleteRule()" data-bs-dismiss="modal">Delete</button>
-      </div>
+                </div>
+                <div class="modal-body" style="color: #999;text-align: center;font-size: 18px;">
+                    <p>Cancellando questo nodo verranno anche cancellati tutti i nodi collegati ad esso.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-target="#myModal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="deleteRule()" data-bs-dismiss="modal">Delete
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
-<div class="modal fade" id="graph_legend" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog right">
-    <div class="modal-content">
-      <div class="modal-header">
-       	<p class="h5" style="padding: 0 10px;" id="right_title"></p>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-     
- <ul class="list-group">
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <i class="fas fa-circle fa-3x" style="color: #d2e5ff;"></i>
-    <span class="">Suggeriti</span>
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div class="modal fade" id="graph_legend" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog right">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="h5" style="padding: 0 10px;" id="right_title"></p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <i class="fas fa-circle fa-3x" style="color: #d2e5ff;"></i>
+                            <span class="">Suggeriti</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
      <span class="material-symbols-outlined" style="font-size: 48px;">
 change_history
 </span>
-    Obiettivi
-   
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <img src="/images/www_icon.svg" alt="My Happy SVG" style="width: 50px;"/>
-    Pagine Web
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <i class="fas fa-file fa-3x"></i>
-    File
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    <img src="/images/LogoTesto.png" alt="My Happy SVG" style="width: 50px;"/>
-    Testo
-  </li>
-</ul>
-      
-      </div>
-      
-      
-     
-    </div>
-  </div>
-</div>
+                            Obiettivi
 
-<div class="modal fade" id="iframe_page" style="overflow-y: hidden!important;" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl" style="height: 80%;">
-    <div class="modal-content" id="resizable" style="height: 80%;">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel"><i class="fab fa-wikipedia-w"></i></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body"  style="max-height: calc(100% - 80px);">
-         <iframe id="iframe" src="https://it.wikipedia.org/wiki/Pagina_principale" title="description" style="width: 100%;height: 100%;"></iframe>
-      </div>
-     
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <img src="/images/www_icon.svg" alt="My Happy SVG" style="width: 50px;"/>
+                            Pagine Web
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <i class="fas fa-file fa-3x"></i>
+                            File
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <img src="/images/LogoTesto.png" alt="My Happy SVG" style="width: 50px;"/>
+                            Testo
+                        </li>
+                    </ul>
+
+                </div>
+
+
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+
+    <div class="modal fade" id="iframe_page" style="overflow-y: hidden!important;" tabindex="-1"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" style="height: 80%;">
+            <div class="modal-content" id="resizable" style="height: 80%;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fab fa-wikipedia-w"></i></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="max-height: calc(100% - 80px);">
+                    <iframe id="iframe" src="https://it.wikipedia.org/wiki/Pagina_principale" title="description"
+                            style="width: 100%;height: 100%;"></iframe>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>

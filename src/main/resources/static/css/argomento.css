@@ -542,3 +542,165 @@ input[type="radio"]{
 #option-2:checked:checked ~ .option-2 span{
     color: #fff;
 }
+
+.goal_container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.goal_box {
+    min-width: 7rem;
+    min-height: 4rem;
+    height: auto;
+    border: 2px solid #333;
+    border-radius: 0.5rem;
+    margin: .5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    user-select: none;
+    cursor: move;
+    transition: 0.5s;
+    white-space: nowrap;
+    padding: .4rem;
+}
+.goal_box span {
+    pointer-events: none;
+}
+.drag-start {
+    opacity: 0.4;
+}
+.drag-enter {
+    border-style: dashed;
+}
+.trash-box {
+    width: 50px;
+    height: 50px;
+    position: relative;
+}
+.container_trash:hover .trash-box:hover .trash-top {
+    transform: translate(-50%, -15%) rotate(-20deg);
+}
+.container_trash:hover .trash-box:hover .trash-btm {
+    transform: translate(-50%, -100%) rotate(5deg);
+}
+.container_trash:hover .trash-box:hover .trash {
+    top: 50%;
+    transform: translate(-42%, -50%) rotate(35deg);
+}
+.trash-box .trash-top {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, -15%);
+    width: 80%;
+    height: 15%;
+    background: #95afc0;
+    border-radius: 5px;
+    transform-origin: left bottom;
+    transition: all 0.2s ease-in-out;
+}
+.trash-box .trash-top::before {
+    content: "";
+    position: absolute;
+    bottom: 95%;
+    left: 50%;
+    transform: translate(-50%);
+    width: 30%;
+    height: 80%;
+    background: inherit;
+    border-radius: 5px 5px 0 0;
+}
+.trash-box .trash-btm {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    width: 70%;
+    height: 65%;
+    background: #95afc0;
+    border-radius: 5px;
+    transform-origin: left 70%;
+    transition: all 0.2s ease-in-out;
+}
+.trash-box .trash-btm .trash-lines {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 80%;
+    display: flex;
+    justify-content: space-around;
+}
+.trash-box .trash-btm .trash-lines .trash-line {
+    width: 20%;
+    height: 100%;
+    background: #7597ad;
+    border-radius: 3px;
+}
+.trash-box .trash {
+    position: absolute;
+    top: 80%;
+    left: 38%;
+    transform: translate(-38%, -80%) rotate(35deg);
+    width: 40%;
+    height: 40%;
+    background: #dff9fb;
+    border-radius: 2px;
+    transition: all 0.2s ease-in-out;
+}
+.trash-box .trash::before {
+    content: "";
+    position: absolute;
+    transform: translate(30%, -20%) rotate(25deg);
+    width: 100%;
+    height: 100%;
+    background: #b2f1f5;
+    border-radius: 2px;
+}
+.container_trash{
+    width: 70px;
+    height: 60px;
+    display: flex;
+    justify-content: end;
+    margin-left: auto;
+}
+
+.removed {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.restored {
+    opacity: 0;
+    transform: scale(1.5);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.restore-btn{
+    margin-left: auto;
+}
+.restore-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.restore-btn:hover {
+    background-color: #2980b9;
+}
+.ObbiettiviDidatticiArgomento{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    position: relative;
+}
