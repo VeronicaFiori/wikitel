@@ -1,40 +1,12 @@
 package it.cnr.istc.psts.wikitel.controller;
 
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessageType;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import it.cnr.istc.pst.oratio.Atom;
-import it.cnr.istc.pst.oratio.Bound;
-import it.cnr.istc.pst.oratio.GraphListener;
+import it.cnr.istc.pst.oratio.*;
 import it.cnr.istc.pst.oratio.Item.ArithItem;
-import it.cnr.istc.pst.oratio.Predicate;
-import it.cnr.istc.pst.oratio.Rational;
-import it.cnr.istc.pst.oratio.Solver;
-import it.cnr.istc.pst.oratio.StateListener;
-import it.cnr.istc.pst.oratio.Type;
 import it.cnr.istc.pst.oratio.timelines.ExecutorException;
 import it.cnr.istc.pst.oratio.timelines.ExecutorListener;
 import it.cnr.istc.pst.oratio.timelines.Timeline;
@@ -46,15 +18,21 @@ import it.cnr.istc.psts.wikitel.Service.ModelService;
 import it.cnr.istc.psts.wikitel.Service.RuleService;
 import it.cnr.istc.psts.wikitel.Service.Starter;
 import it.cnr.istc.psts.wikitel.Service.UserService;
-import it.cnr.istc.psts.wikitel.db.LessonEntity;
-import it.cnr.istc.psts.wikitel.db.RuleEntity;
-import it.cnr.istc.psts.wikitel.db.TextRuleEntity;
-import it.cnr.istc.psts.wikitel.db.UserEntity;
-import it.cnr.istc.psts.wikitel.db.WebRuleEntity;
-import it.cnr.istc.psts.wikitel.db.WikiRuleEntity;
+import it.cnr.istc.psts.wikitel.db.*;
 import it.cnr.psts.wikitel.API.Lesson.LessonState;
 import it.cnr.psts.wikitel.API.Message;
 import it.cnr.psts.wikitel.API.Message.Stimulus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageType;
+
+import java.text.Normalizer;
+import java.util.*;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 
 
@@ -83,7 +61,8 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 	private Flaw current_flaw = null;
 	private final Map<Long, Resolver> resolvers = new HashMap<>();
 	private Resolver current_resolver = null;
-	private Long user;
+	private UserEntity student;
+	private float horizon;
 
 
 	Stimulus st = null;
@@ -98,7 +77,7 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 		this.userservice = userservice;
 		for (final UserEntity student : lesson.getFollowed_by()) {
 			stimuli.put(student.getId(), new ArrayList<>());
-			user = student.getId();
+			this.student = student;
 		}
 
 		solver.addStateListener(this);
@@ -107,12 +86,11 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 	}
 	
 	
-	private HashSet<RuleEntity> ycategory() throws JsonMappingException, JsonProcessingException  {
+	private HashSet<RuleEntity> getArgomentiPerStudenti() throws JsonMappingException, JsonProcessingException  {
 		final HashSet<RuleEntity> argomenti= new HashSet<>();
 		
 		ObjectMapper mapper = new ObjectMapper();
-		for( UserEntity user: lesson.getFollowed_by() ) {
-			List<String> profile = mapper.readValue(user.getProfile(), new TypeReference<List<String>>(){});
+			List<String> profile = mapper.readValue(student.getProfile(), new TypeReference<List<String>>(){});
 			for (RuleEntity arg : lesson.getGoals()) {
 				for(String topic: arg.getTopics()) {
 					if (profile.contains(topic)){
@@ -120,7 +98,6 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 					}
 				}
 			}
-		}
 		return argomenti;
 	}
 //	
@@ -143,10 +120,11 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 	public void Solve() throws JsonMappingException, JsonProcessingException {
 		final StringBuilder sb = new StringBuilder();
 		to_string(sb, lesson);
-
-		if (ycategory()!=null) {
+		HashSet<RuleEntity> argomentiPerStudenti = getArgomentiPerStudenti();
+		if (!argomentiPerStudenti.isEmpty()) {
           System.out.println("At least one argument is present in the user's interests.");
           // Puoi aggiungere qui la logica per gestire il caso in cui almeno un argomento è presente negli interessi
+			setHorizon(argomentiPerStudenti);
       } else {
           System.out.println("No arguments are present in the user's interests.");
       }
@@ -191,12 +169,24 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 //		setState(LessonState.Stopped);
 //	}
 
+	public float getHorizon(){
+		return this.horizon;
+	}
+
+	public void setHorizon(HashSet<RuleEntity> argomentiPerStudenti){
+		float horizon = 0;
+		for(RuleEntity arg : argomentiPerStudenti){
+			horizon += arg.getLength();
+		}
+		this.horizon = horizon;
+	}
+
 	public Solver getSolver() {
 		return solver;
 	}
 
 	public void play() {
-		System.out.println("User lesson MANAGER:"+ user);
+		System.out.println("User lesson MANAGER:"+ student.getId());
 		scheduled_feature = Starter.EXECUTOR.scheduleAtFixedRate(() -> {
 			try {
 				executor.tick();
@@ -339,7 +329,7 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 		if(!lesson.getAsync()) {
 			wsc = UserController.ONLINE.get(lesson.getTeacher().getId());
 		}else {
-			wsc = UserController.ONLINE.get(user);
+			wsc = UserController.ONLINE.get(student.getId());
 		}
 		if (wsc != null)
 			try {
