@@ -1,8 +1,5 @@
 package it.cnr.istc.psts.wikitel.controller;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,28 +16,23 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.support.MessageHeaderInitializer;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.cnr.istc.pst.oratio.Atom;
 import it.cnr.istc.pst.oratio.Bound;
 import it.cnr.istc.pst.oratio.GraphListener;
+import it.cnr.istc.pst.oratio.Item.ArithItem;
 import it.cnr.istc.pst.oratio.Predicate;
 import it.cnr.istc.pst.oratio.Rational;
 import it.cnr.istc.pst.oratio.Solver;
-import it.cnr.istc.pst.oratio.Item.ArithItem;
-import it.cnr.istc.pst.oratio.SolverException;
 import it.cnr.istc.pst.oratio.StateListener;
 import it.cnr.istc.pst.oratio.Type;
 import it.cnr.istc.pst.oratio.timelines.ExecutorException;
@@ -49,8 +41,12 @@ import it.cnr.istc.pst.oratio.timelines.Timeline;
 import it.cnr.istc.pst.oratio.timelines.TimelinesExecutor;
 import it.cnr.istc.pst.oratio.utils.Flaw;
 import it.cnr.istc.pst.oratio.utils.Resolver;
+import it.cnr.istc.psts.Websocket.Sending;
+import it.cnr.istc.psts.wikitel.Service.ModelService;
+import it.cnr.istc.psts.wikitel.Service.RuleService;
+import it.cnr.istc.psts.wikitel.Service.Starter;
+import it.cnr.istc.psts.wikitel.Service.UserService;
 import it.cnr.istc.psts.wikitel.db.LessonEntity;
-import it.cnr.istc.psts.wikitel.db.ModelEntity;
 import it.cnr.istc.psts.wikitel.db.RuleEntity;
 import it.cnr.istc.psts.wikitel.db.TextRuleEntity;
 import it.cnr.istc.psts.wikitel.db.UserEntity;
@@ -59,8 +55,6 @@ import it.cnr.istc.psts.wikitel.db.WikiRuleEntity;
 import it.cnr.psts.wikitel.API.Lesson.LessonState;
 import it.cnr.psts.wikitel.API.Message;
 import it.cnr.psts.wikitel.API.Message.Stimulus;
-import it.cnr.istc.psts.Websocket.Sending;
-import it.cnr.istc.psts.wikitel.Service.*;
 
 
 
@@ -111,39 +105,91 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 		solver.addGraphListener(this);
 		executor.addExecutorListener(this);
 	}
-
-	public void Solve() {
+	
+	
+	private HashSet<RuleEntity> ycategory() throws JsonMappingException, JsonProcessingException  {
+		final HashSet<RuleEntity> argomenti= new HashSet<>();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		for( UserEntity user: lesson.getFollowed_by() ) {
+			List<String> profile = mapper.readValue(user.getProfile(), new TypeReference<List<String>>(){});
+			for (RuleEntity arg : lesson.getGoals()) {
+				for(String topic: arg.getTopics()) {
+					if (profile.contains(topic)){
+						argomenti.add(arg);
+					}
+				}
+			}
+		}
+		return argomenti;
+	}
+//	
+//	public void Solve() {
+//		if (ycategory()) {
+//            System.out.println("At least one argument is present in the user's interests.");
+//            // Puoi aggiungere qui la logica per gestire il caso in cui almeno un argomento è presente negli interessi
+//        } else {
+//            System.out.println("No arguments are present in the user's interests.");
+//            // Puoi aggiungere qui la logica per gestire il caso in cui nessun argomento è presente negli interessi
+//        }
+//        
+//        // Impostiamo lo stato della lezione su "Stopped"
+//        setState(LessonState.Stopped);
+//	
+//	}
+		
+	
+	
+	public void Solve() throws JsonMappingException, JsonProcessingException {
 		final StringBuilder sb = new StringBuilder();
 		to_string(sb, lesson);
 
-		final File lesson_file = new File(System.getProperty("user.dir")+"//riddle//" + lesson.getId() + user + ".rddl");
-		try {
-			if (lesson_file.createNewFile()) {
-				System.out.println("File created: " + lesson_file.getName());
-			} else {
-				System.out.println("File already exists.");
-			}
-			final FileWriter writer = new FileWriter(lesson_file, false);
-			writer.append(sb);
-			writer.close();
-		} catch (final IOException e) {
-			LOG.error("Cannot create lesson problem file", e);
-		}
-
-		LOG.info("Reading lesson \"{}\" planning problem..", lesson.getName());
-		try {// we load the planning problem..
-			solver.read(sb.toString());
-		} catch (SolverException e) {
-			LOG.error("cannot read the given problem..", e);
-		}
-		LOG.info("Solving lesson \"{}\" planning problem..", lesson.getName());
-		try { // we solve the planning problem..
-			solver.solve();
-		} catch (SolverException e) {
-			LOG.error("cannot solve the given problem..", e);
-		}
-		setState(LessonState.Stopped);
+		if (ycategory()!=null) {
+          System.out.println("At least one argument is present in the user's interests.");
+          // Puoi aggiungere qui la logica per gestire il caso in cui almeno un argomento è presente negli interessi
+      } else {
+          System.out.println("No arguments are present in the user's interests.");
+      }
+      
 	}
+		
+
+
+
+
+
+//	public void Solve() {
+//		final StringBuilder sb = new StringBuilder();
+//		to_string(sb, lesson);
+//
+//		final File lesson_file = new File(System.getProperty("user.dir")+"//riddle//" + lesson.getId() + user + ".rddl");
+//		try {
+//			if (lesson_file.createNewFile()) {
+//				System.out.println("File created: " + lesson_file.getName());
+//			} else {
+//				System.out.println("File already exists.");
+//			}
+//			final FileWriter writer = new FileWriter(lesson_file, false);
+//			writer.append(sb);
+//			writer.close();
+//		} catch (final IOException e) {
+//			LOG.error("Cannot create lesson problem file", e);
+//		}
+//
+//		LOG.info("Reading lesson \"{}\" planning problem..", lesson.getName());
+//		try {// we load the planning problem..
+//			solver.read(sb.toString());
+//		} catch (SolverException e) {
+//			LOG.error("cannot read the given problem..", e);
+//		}
+//		LOG.info("Solving lesson \"{}\" planning problem..", lesson.getName());
+//		try { // we solve the planning problem..
+//			solver.solve();
+//		} catch (SolverException e) {
+//			LOG.error("cannot solve the given problem..", e);
+//		}
+//		setState(LessonState.Stopped);
+//	}
 
 	public Solver getSolver() {
 		return solver;

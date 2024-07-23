@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import it.cnr.istc.psts.Websocket.Sending;
 import it.cnr.istc.psts.wikitel.Mongodb.SuggestionM;
 import it.cnr.istc.psts.wikitel.Mongodb.SuggestionMongo;
@@ -59,7 +62,7 @@ public class RuleService {
 		
 		
 		@Transactional
-	    public void delete(Long m, Long r) {
+	    public void delete(Long m, Long r) throws JsonMappingException, JsonProcessingException {
 			ModelEntity model = this.modelservice.getModel(m);
 			RuleEntity rule_first = this.getRule(r);
 			

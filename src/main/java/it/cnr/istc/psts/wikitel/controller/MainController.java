@@ -916,7 +916,7 @@ public class MainController {
   
   
   @RequestMapping(value = "/deleterule", method = RequestMethod.POST)
-  public Response deleteRule(@RequestBody ObjectNode node) {
+  public Response deleteRule(@RequestBody ObjectNode node) throws JsonMappingException, JsonProcessingException {
 	  this.ruleservice.delete(node.get("model").asLong(), node.get("rule").asLong());
 	  Response response = new Response("OK");
     return response;

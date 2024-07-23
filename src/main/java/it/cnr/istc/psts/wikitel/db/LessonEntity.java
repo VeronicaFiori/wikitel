@@ -57,6 +57,9 @@ public class LessonEntity {
     
     @ManyToMany
     private List<Files> files = new ArrayList<>();
+    
+    @OneToMany
+    private List<StudentLesson> lezioni;
 
     public void addStudent(final UserEntity student) {
         followed_by.add(student);
