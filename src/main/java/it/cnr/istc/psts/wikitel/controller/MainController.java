@@ -1,44 +1,5 @@
 package it.cnr.istc.psts.wikitel.controller;
 
-import org.json.JSONObject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import it.cnr.istc.psts.wikitel.db.*;
-
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.SimpMessageType;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.support.MessageHeaderInitializer;
-
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -47,52 +8,46 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import io.netty.handler.codec.MessageAggregationException;
-
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.repository.query.Param;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
-
 import it.cnr.istc.psts.Websocket.Sending;
 import it.cnr.istc.psts.wikitel.MongoRepository.RuleMongoRepository;
-
 import it.cnr.istc.psts.wikitel.Mongodb.RuleMongo;
 import it.cnr.istc.psts.wikitel.Mongodb.SuggestionM;
 import it.cnr.istc.psts.wikitel.Mongodb.SuggestionMongo;
 import it.cnr.istc.psts.wikitel.Repository.ModelRepository;
-
 import it.cnr.istc.psts.wikitel.Repository.Response;
 import it.cnr.istc.psts.wikitel.Repository.RuleRepository;
 import it.cnr.istc.psts.wikitel.Repository.UserRepository;
-import it.cnr.istc.psts.wikitel.Service.CredentialService;
-import it.cnr.istc.psts.wikitel.Service.FilesService;
-import it.cnr.istc.psts.wikitel.Service.LessonService;
-import it.cnr.istc.psts.wikitel.Service.ModelService;
-import it.cnr.istc.psts.wikitel.Service.RuleService;
-import it.cnr.istc.psts.wikitel.Service.RuleSuggestionRelationService;
-import it.cnr.istc.psts.wikitel.Service.Starter;
-import it.cnr.istc.psts.wikitel.Service.UserService;
+import it.cnr.istc.psts.wikitel.Service.*;
+import it.cnr.istc.psts.wikitel.db.*;
+import it.cnr.psts.wikitel.API.Lesson.LessonState;
 import it.cnr.psts.wikitel.API.Message;
 import net.bytebuddy.utility.RandomString;
-import it.cnr.psts.wikitel.API.Lesson.LessonState;;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageType;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.*;
+
+;
 
 @RestController
 public class MainController {
@@ -197,7 +152,7 @@ public class MainController {
           String n = String.valueOf(session.getLesson_id()) + String.valueOf(u.getId());
           LessonManager manager = MainController.LESSONS.get(n);
           send.notify(Starter.mapper.writeValueAsString(new Message.User(u.getId())), session.getSession());
-          send.notify(Starter.mapper.writeValueAsString(new LessonManager.Timelines(session.getLesson_id(), manager.getSolver().getTimelines())), session.getSession());
+          send.notify(Starter.mapper.writeValueAsString(new Message.Timeline(manager.geTimeline())), session.getSession());
           send.notify(Starter.mapper.writeValueAsString(new LessonManager.Tick(session.getLesson_id(), manager.getCurrentTime())), session.getSession());
         }
       } else {
@@ -205,7 +160,7 @@ public class MainController {
         String n = String.valueOf(session.getLesson_id()) + String.valueOf(session.getUser_id());
         LessonManager manager = MainController.LESSONS.get(n);
 
-        send.notify(Starter.mapper.writeValueAsString(new LessonManager.Timelines(session.getLesson_id(), manager.getSolver().getTimelines())), session.getSession());
+        send.notify(Starter.mapper.writeValueAsString(new Message.Timeline(manager.geTimeline())), session.getSession());
         send.notify(Starter.mapper.writeValueAsString(new LessonManager.Tick(session.getLesson_id(), manager.getCurrentTime())), session.getSession());
 
         if (manager.st != null) {
@@ -575,7 +530,7 @@ public class MainController {
       System.out.println(n);
       System.out.println(LESSONS);
       if (LESSONS.get(n).getState() != LessonState.Running) {
-        LESSONS.get(n).play();
+        //LESSONS.get(n).play();
       }
     }
     else {
@@ -584,7 +539,7 @@ public class MainController {
         System.out.println(n);
         System.out.println(LESSONS);
         if (LESSONS.get(n).getState() != LessonState.Running) {
-          LESSONS.get(n).play();
+          //LESSONS.get(n).play();
         }
       }
     }
@@ -603,7 +558,7 @@ public class MainController {
       System.out.println(n);
       System.out.println(LESSONS);
       if (LESSONS.get(n).getState() != LessonState.Paused) {
-        LESSONS.get(n).pause();
+        //LESSONS.get(n).pause();
       }
     }
     else {
@@ -612,7 +567,7 @@ public class MainController {
         System.out.println(n);
         System.out.println(LESSONS);
         if (LESSONS.get(n).getState() != LessonState.Paused) {
-          LESSONS.get(n).pause();
+          //LESSONS.get(n).pause();
         }
       }
     }
@@ -632,7 +587,7 @@ public class MainController {
       System.out.println(n);
       System.out.println(LESSONS);
       if (LESSONS.get(n).getState() != LessonState.Stopped) {
-        LESSONS.get(n).stop();
+        //LESSONS.get(n).stop();
       }
     }
     else {
@@ -641,7 +596,7 @@ public class MainController {
         System.out.println(n);
         System.out.println(LESSONS);
         if (LESSONS.get(n).getState() != LessonState.Stopped) {
-          LESSONS.get(n).stop();
+          //LESSONS.get(n).stop();
         }
       }
     }

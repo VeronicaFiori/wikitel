@@ -1,17 +1,15 @@
 package it.cnr.psts.wikitel.API;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import it.cnr.psts.wikitel.API.Lesson.LessonState;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
@@ -23,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
         @Type(value = Message.UnfollowLesson.class, name = "unfollow-lesson"),
         @Type(value = Message.RemoveLesson.class, name = "remove-lesson"),
         @Type(value = Message.LessonStateUpdate.class, name = "lesson-state-update"),
+        @Type(value = Message.Timeline.class, name = "Timeline"),
         @Type(value = Message.Stimulus.TextStimulus.class, name = "text-stimulus"),
         @Type(value = Message.Stimulus.QuestionStimulus.class, name = "question-stimulus"),
         @Type(value = Message.Stimulus.URLStimulus.class, name = "url-stimulus"),
@@ -58,6 +57,24 @@ public abstract class Message {
         public boolean isOnline() {
             return online;
         }
+    }
+
+    public static class Timeline extends Message {
+
+        private final it.cnr.psts.wikitel.API.Timeline timeline;
+
+        @JsonCreator
+        public Timeline(@JsonProperty("timeline") final it.cnr.psts.wikitel.API.Timeline timeline) {
+            this.timeline = timeline;
+        }
+
+        /**
+         * @return the user.
+         */
+        public it.cnr.psts.wikitel.API.Timeline getTimeline() {
+            return timeline;
+        }
+
     }
     
     /**

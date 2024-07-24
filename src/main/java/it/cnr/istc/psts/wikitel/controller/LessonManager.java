@@ -5,12 +5,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.istc.pst.oratio.*;
-import it.cnr.istc.pst.oratio.Item.ArithItem;
-import it.cnr.istc.pst.oratio.timelines.ExecutorException;
+import it.cnr.istc.pst.oratio.Atom;
+import it.cnr.istc.pst.oratio.Bound;
+import it.cnr.istc.pst.oratio.GraphListener;
+import it.cnr.istc.pst.oratio.Rational;
 import it.cnr.istc.pst.oratio.timelines.ExecutorListener;
-import it.cnr.istc.pst.oratio.timelines.Timeline;
-import it.cnr.istc.pst.oratio.timelines.TimelinesExecutor;
+import it.cnr.psts.wikitel.API.Timeline;
 import it.cnr.istc.pst.oratio.utils.Flaw;
 import it.cnr.istc.pst.oratio.utils.Resolver;
 import it.cnr.istc.psts.Websocket.Sending;
@@ -22,6 +22,7 @@ import it.cnr.istc.psts.wikitel.db.*;
 import it.cnr.psts.wikitel.API.Lesson.LessonState;
 import it.cnr.psts.wikitel.API.Message;
 import it.cnr.psts.wikitel.API.Message.Stimulus;
+import it.cnr.psts.wikitel.API.TimelineValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.MessageHeaders;
@@ -31,12 +32,11 @@ import org.springframework.messaging.simp.SimpMessageType;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 
 
-public class LessonManager implements StateListener, GraphListener, ExecutorListener  {
+public class LessonManager implements GraphListener, ExecutorListener  {
 
 	ModelService modelservice;
 
@@ -50,9 +50,9 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 	static final Logger LOG = LoggerFactory.getLogger(LessonManager.class);
 	public  LessonEntity lesson;
 	private ScheduledFuture<?> scheduled_feature;
-	private final Solver solver = new Solver();
+	//private final Solver solver = new Solver();
 	private final Map<Long, Atom> c_atoms = new HashMap<>();
-	private final TimelinesExecutor executor = new TimelinesExecutor(solver ,"{}", new Rational(1));
+	//private final TimelinesExecutor executor = new TimelinesExecutor(solver ,"{}", new Rational(1));
 	private final Set<String> topics = new HashSet<>();
 	private LessonState state = LessonState.Stopped;
 	private final Map<Long, Collection<Stimulus>> stimuli = new HashMap<>();
@@ -62,7 +62,7 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 	private final Map<Long, Resolver> resolvers = new HashMap<>();
 	private Resolver current_resolver = null;
 	private UserEntity student;
-	private float horizon;
+	private Timeline timeline;
 
 
 	Stimulus st = null;
@@ -80,21 +80,26 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 			this.student = student;
 		}
 
-		solver.addStateListener(this);
-		solver.addGraphListener(this);
-		executor.addExecutorListener(this);
+//		solver.addStateListener(this);
+//		solver.addGraphListener(this);
+//		executor.addExecutorListener(this);
 	}
 	
 	
-	private HashSet<RuleEntity> getArgomentiPerStudenti() throws JsonMappingException, JsonProcessingException  {
-		final HashSet<RuleEntity> argomenti= new HashSet<>();
+	private List<RuleEntity> getArgomentiPerStudenti() throws JsonMappingException, JsonProcessingException  {
+		final List<RuleEntity> argomenti= new ArrayList<>();
 		
 		ObjectMapper mapper = new ObjectMapper();
 			List<String> profile = mapper.readValue(student.getProfile(), new TypeReference<List<String>>(){});
 			for (RuleEntity arg : lesson.getGoals()) {
-				for(String topic: arg.getTopics()) {
-					if (profile.contains(topic)){
-						argomenti.add(arg);
+				if(arg instanceof WebRuleEntity || arg instanceof TextRuleEntity){
+					argomenti.add(arg);
+				}else{
+					for(String topic: arg.getTopics()) {
+						if (profile.contains(topic)) {
+							argomenti.add(arg);
+							break;
+						}
 					}
 				}
 			}
@@ -114,27 +119,19 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 //        setState(LessonState.Stopped);
 //	
 //	}
-		
-	
-	
+
 	public void Solve() throws JsonMappingException, JsonProcessingException {
 		final StringBuilder sb = new StringBuilder();
 		to_string(sb, lesson);
-		HashSet<RuleEntity> argomentiPerStudenti = getArgomentiPerStudenti();
+		List<RuleEntity> argomentiPerStudenti = getArgomentiPerStudenti();
 		if (!argomentiPerStudenti.isEmpty()) {
           System.out.println("At least one argument is present in the user's interests.");
-          // Puoi aggiungere qui la logica per gestire il caso in cui almeno un argomento è presente negli interessi
-			setHorizon(argomentiPerStudenti);
+			setTimeline(argomentiPerStudenti);
       } else {
           System.out.println("No arguments are present in the user's interests.");
       }
       
 	}
-		
-
-
-
-
 
 //	public void Solve() {
 //		final StringBuilder sb = new StringBuilder();
@@ -169,44 +166,54 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 //		setState(LessonState.Stopped);
 //	}
 
-	public float getHorizon(){
-		return this.horizon;
+	public Timeline geTimeline(){
+		return this.timeline;
 	}
 
-	public void setHorizon(HashSet<RuleEntity> argomentiPerStudenti){
+	public void setTimeline(List<RuleEntity> argomentiPerStudenti){
+		this.timeline = new Timeline(new ArrayList<>());
 		float horizon = 0;
+		float currentTime = 0;
 		for(RuleEntity arg : argomentiPerStudenti){
 			horizon += arg.getLength();
+			TimelineValue timelineValue = new TimelineValue();
+			timelineValue.setArg(arg.getName());
+			timelineValue.setHorizon(arg.getLength());
+			timelineValue.setFrom(currentTime);
+			timelineValue.setTo(currentTime + arg.getLength());
+			this.timeline.getValue().add(timelineValue);
+			currentTime += arg.getLength();
 		}
-		this.horizon = horizon;
+		this.timeline.setHorizon(horizon);
 	}
 
-	public Solver getSolver() {
-		return solver;
-	}
 
-	public void play() {
-		System.out.println("User lesson MANAGER:"+ student.getId());
-		scheduled_feature = Starter.EXECUTOR.scheduleAtFixedRate(() -> {
-			try {
-				executor.tick();
-			} catch (ExecutorException e) {
-				LOG.error("cannot execute the given solution..", e);
-				scheduled_feature.cancel(false);
-			}
-		}, 1, 1, TimeUnit.SECONDS);
-		setState(LessonState.Running);
-	}
+//	public Solver getSolver() {
+//		return solver;
+//	}
 
-	public void pause() {
-		scheduled_feature.cancel(false);
-		setState(LessonState.Paused);
-	}
+//	public void play() {
+//		System.out.println("User lesson MANAGER:"+ student.getId());
+//		scheduled_feature = Starter.EXECUTOR.scheduleAtFixedRate(() -> {
+//			try {
+//				executor.tick();
+//			} catch (ExecutorException e) {
+//				LOG.error("cannot execute the given solution..", e);
+//				scheduled_feature.cancel(false);
+//			}
+//		}, 1, 1, TimeUnit.SECONDS);
+//		setState(LessonState.Running);
+//	}
 
-	public void stop() {
-		scheduled_feature.cancel(false);
-		setState(LessonState.Stopped);
-	}
+//	public void pause() {
+//		scheduled_feature.cancel(false);
+//		setState(LessonState.Paused);
+//	}
+//
+//	public void stop() {
+//		scheduled_feature.cancel(false);
+//		setState(LessonState.Stopped);
+//	}
 
 	public LessonState getState() {
 		return state;
@@ -344,14 +351,12 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 			} catch (final JsonProcessingException e) {
 				LOG.error("Cannot write tick message..", e);
 			}
-		try {
-			if (((ArithItem) solver.get("horizon")).getValue().leq(current_time)) {
-				LOG.info("Nothing more to execute..");
-				scheduled_feature.cancel(false);
-			}
-		} catch (final NoSuchFieldException e) {
-			LOG.error("Cannot find horizon..", e);
-		}
+//		try {
+//			if (((ArithItem) solver.get("horizon")).getValue().leq(current_time)) {
+//				LOG.info("Nothing more to execute..");
+//				scheduled_feature.cancel(false);
+////			}
+//		}
 	}
 
 	@Override
@@ -497,55 +502,24 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 		}
 	}
 
-	@Override
-	public void inconsistentProblem() {
-		LOG.info("Lesson \"{}\" inconsistent planning problem..", lesson.getName());
-	}
 
-	@Override
-	public void log(String arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void read(String arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void read(String[] arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void startedSolving() {
-		LOG.info("Started solving lesson \"{}\" planning problem..", lesson.getName());
-	}
-
-	@Override
-	public void stateChanged() {
-	}
-
-	@Override
-	public void solutionFound() {
-		LOG.info("Lesson \"{}\" planning problem solution found..", lesson.getName());
-
-		c_atoms.clear();
-
-		for (final Type t : solver.getTypes().values())
-			for (final Predicate p : t.getPredicates().values())
-				p.getInstances().stream().map(atm -> (Atom) atm)
-						.filter(atm -> (atm.getState() == Atom.AtomState.Active))
-						.forEach(atm -> c_atoms.put(atm.getSigma(), atm));
-
-
-
-
-
-	}
+//	@Override
+//	public void solutionFound() {
+//		LOG.info("Lesson \"{}\" planning problem solution found..", lesson.getName());
+//
+//		c_atoms.clear();
+//
+//		for (final Type t : solver.getTypes().values())
+//			for (final Predicate p : t.getPredicates().values())
+//				p.getInstances().stream().map(atm -> (Atom) atm)
+//						.filter(atm -> (atm.getState() == Atom.AtomState.Active))
+//						.forEach(atm -> c_atoms.put(atm.getSigma(), atm));
+//
+//
+//
+//
+//
+//	}
 
 
 	private static void to_string(final StringBuilder sb, final LessonEntity lesson_entity) {
@@ -801,16 +775,6 @@ public class LessonManager implements StateListener, GraphListener, ExecutorList
 
 		CausalLinkAdded(final long lesson, final long flaw, final long resolver) {
 			super(flaw, resolver);
-			this.lesson = lesson;
-		}
-	}
-
-	static class Timelines extends it.cnr.istc.pst.oratio.utils.Message.Timelines {
-
-		public final long lesson;
-
-		Timelines(final long lesson, final Collection<Timeline<?>> timelines) {
-			super(timelines);
 			this.lesson = lesson;
 		}
 	}

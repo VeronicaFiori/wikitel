@@ -27,16 +27,14 @@ let one=true;
 	
 	rows =[];
 	array.forEach(function(s) {
-		getName(s.atom.predicate);
-         document.getElementById("lista_obiettivi").innerHTML+= '<li  id="b'+ s.atom.predicate.substring(3,s.atom.predicate.length)+'"\>' +
+         document.getElementById("lista_obiettivi").innerHTML+= '<li  id="b'+ s.arg+'"\>' +
              '<span className="d-inline-block" tabIndex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" '+
                    'data-bs-content="Clicca per vissualizzare la pagina Wikipedia">' +
 
-             '<button  style="background:none;border:none;" onclick="wikilink(\'' + name + '\')"><strong >'+ name +'</strong></button></span>\n' +
+             '<button  style="background:none;border:none;" onclick="wikilink(\'' + s.arg + '\')"><strong >'+ s.arg +'</strong></button></span>\n' +
              '</li>';
-	rows.push(['rule', name , new Date(0,0,0,0,0,s.from),new Date(0,0,0,0,0,s.to)  ])
+	rows.push(['rule', s.arg , new Date(0,0,0,0,0,s.from),new Date(0,0,0,0,0,s.to)  ])
 	});
-    console.log("FATTO")
 	if(u!=null){
 	var container = document.getElementById('timeline'+u);}
 	else{
