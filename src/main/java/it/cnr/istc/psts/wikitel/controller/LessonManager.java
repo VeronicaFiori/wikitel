@@ -52,7 +52,11 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 	private ScheduledFuture<?> scheduled_feature;
 	//private final Solver solver = new Solver();
 	private final Map<Long, Atom> c_atoms = new HashMap<>();
+	
+    private Executor executor;
+
 	//private final TimelinesExecutor executor = new TimelinesExecutor(solver ,"{}", new Rational(1));
+	
 	private final Set<String> topics = new HashSet<>();
 	private LessonState state = LessonState.Stopped;
 	private final Map<Long, Collection<Stimulus>> stimuli = new HashMap<>();
@@ -63,6 +67,7 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 	private Resolver current_resolver = null;
 	private UserEntity student;
 	private Timeline timeline;
+
 
 
 	Stimulus st = null;
@@ -79,10 +84,6 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 			stimuli.put(student.getId(), new ArrayList<>());
 			this.student = student;
 		}
-
-//		solver.addStateListener(this);
-//		solver.addGraphListener(this);
-//		executor.addExecutorListener(this);
 	}
 	
 	
@@ -92,7 +93,7 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 		ObjectMapper mapper = new ObjectMapper();
 			List<String> profile = mapper.readValue(student.getProfile(), new TypeReference<List<String>>(){});
 			for (RuleEntity arg : lesson.getGoals()) {
-				if(arg instanceof WebRuleEntity || arg instanceof TextRuleEntity){
+				if(arg instanceof WebRuleEntity || arg instanceof TextRuleEntity || arg instanceof FileRuleEntity){
 					argomenti.add(arg);
 				}else{
 					for(String topic: arg.getTopics()) {
@@ -105,20 +106,7 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 			}
 		return argomenti;
 	}
-//	
-//	public void Solve() {
-//		if (ycategory()) {
-//            System.out.println("At least one argument is present in the user's interests.");
-//            // Puoi aggiungere qui la logica per gestire il caso in cui almeno un argomento è presente negli interessi
-//        } else {
-//            System.out.println("No arguments are present in the user's interests.");
-//            // Puoi aggiungere qui la logica per gestire il caso in cui nessun argomento è presente negli interessi
-//        }
-//        
-//        // Impostiamo lo stato della lezione su "Stopped"
-//        setState(LessonState.Stopped);
-//	
-//	}
+
 
 	public void Solve() throws JsonMappingException, JsonProcessingException {
 		final StringBuilder sb = new StringBuilder();
@@ -132,17 +120,99 @@ public class LessonManager implements GraphListener, ExecutorListener  {
       }
       
 	}
+	
 
-//	public void Solve() {
-//		final StringBuilder sb = new StringBuilder();
-//		to_string(sb, lesson);
+/**********PROVA**********/
+//	private void play( List<RuleEntity> argomentiPerStudenti) {
 //
-//		final File lesson_file = new File(System.getProperty("user.dir")+"//riddle//" + lesson.getId() + user + ".rddl");
-//		try {
-//			if (lesson_file.createNewFile()) {
-//				System.out.println("File created: " + lesson_file.getName());
-//			} else {
-//				System.out.println("File already exists.");
+//		int i= 0;
+//		
+//	    for(RuleEntity arg : argomentiPerStudenti){
+//	      if(arg!=null) {
+//		   for(i=0; i<=arg.getLength();i++) {
+//			  play(argomentiPerStudenti);			
+//			 }
+//            
+//		   }	     
+//	      }  		   
+//	    }
+	
+	private int currentIndex = 0; // Indice dell'argomento corrente
+	private int counter = 0; // Contatore per il progresso della lezione
+
+	public void play() throws JsonMappingException, JsonProcessingException {
+//		List<RuleEntity> argomentiPerStudenti = getArgomentiPerStudenti();
+//
+//	    if (argomentiPerStudenti == null || argomentiPerStudenti.isEmpty()) {
+//	        // Gestisci il caso in cui non ci siano argomenti
+//	        return;
+//	    }
+//	    
+//	    RuleEntity currentArgomento = argomentiPerStudenti.get(currentIndex);
+//
+//	    for(RuleEntity arg : argomentiPerStudenti){
+//	    if (arg != null) {
+//	        Long length = arg.getLength();
+//	        
+//	        
+//	        
+//			// Azione di play
+//	       // if (lesson.play) {
+//	            counter++;
+//	            setState(LessonState.Running);
+//	                       
+//	            if (counter >= length) {
+//	                currentIndex++;
+//	                
+//	                counter = 0; 
+//	                if (currentIndex >= argomentiPerStudenti.size()) {
+//	                    return;
+//	                }
+//	            }
+//	      // } else if ("next".equals(e.getActionCommand())) {
+//
+//	        	if (counter < length / 2) {
+//	                int response = JOptionPane.showConfirmDialog(null, 
+//	                    "Sei sicuro di voler andare avanti? Non hai completato metà della lezione.",
+//	                    "Conferma",
+//	                    JOptionPane.YES_NO_OPTION);
+//	                
+//	                if (response == JOptionPane.YES_OPTION) {
+//	                    currentIndex++;
+//	                    counter = 0; // Resetta il contatore
+//	                    if (currentIndex >= argomentiPerStudenti.size()) {
+//	                      
+//	                        return;
+//	                    }
+//	                }
+//	            } else {
+//	                currentIndex++;
+//	                counter = 0; 
+//	                if (currentIndex >= argomentiPerStudenti.size()) {
+//	                    return;
+//	                }
+//	            }
+//	        }
+//	   } else {
+//	        // Gestisci il caso in cui l'argomento corrente è null
+//	        System.out.println("Argomento corrente non valido.");
+//	    }
+//	  }
+	}
+
+
+
+
+
+
+//	public void play() {
+//		System.out.println("User lesson MANAGER:"+ student.getId());
+//		scheduled_feature = Starter.EXECUTOR.scheduleAtFixedRate(() -> {
+//			try {
+//				executor.tick();
+//			} catch (ExecutorException e) {
+//				LOG.error("cannot execute the given solution..", e);
+//				scheduled_feature.cancel(false);
 //			}
 //			final FileWriter writer = new FileWriter(lesson_file, false);
 //			writer.append(sb);
@@ -150,6 +220,9 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 //		} catch (final IOException e) {
 //			LOG.error("Cannot create lesson problem file", e);
 //		}
+//		}, 1, 1, TimeUnit.SECONDS);
+//		setState(LessonState.Running);
+//	}
 //
 //		LOG.info("Reading lesson \"{}\" planning problem..", lesson.getName());
 //		try {// we load the planning problem..
@@ -163,8 +236,22 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 //		} catch (SolverException e) {
 //			LOG.error("cannot solve the given problem..", e);
 //		}
-//		setState(LessonState.Stopped);
-//	}
+		
+		
+	public void pause() {
+		scheduled_feature.cancel(false);
+		setState(LessonState.Paused);
+	}
+
+		
+		
+	public void stop() {
+		scheduled_feature.cancel(false);
+		setState(LessonState.Stopped);
+	}
+	
+	
+	
 
 	public Timeline geTimeline(){
 		return this.timeline;
@@ -186,34 +273,8 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 		}
 		this.timeline.setHorizon(horizon);
 	}
+	
 
-
-//	public Solver getSolver() {
-//		return solver;
-//	}
-
-//	public void play() {
-//		System.out.println("User lesson MANAGER:"+ student.getId());
-//		scheduled_feature = Starter.EXECUTOR.scheduleAtFixedRate(() -> {
-//			try {
-//				executor.tick();
-//			} catch (ExecutorException e) {
-//				LOG.error("cannot execute the given solution..", e);
-//				scheduled_feature.cancel(false);
-//			}
-//		}, 1, 1, TimeUnit.SECONDS);
-//		setState(LessonState.Running);
-//	}
-
-//	public void pause() {
-//		scheduled_feature.cancel(false);
-//		setState(LessonState.Paused);
-//	}
-//
-//	public void stop() {
-//		scheduled_feature.cancel(false);
-//		setState(LessonState.Stopped);
-//	}
 
 	public LessonState getState() {
 		return state;
@@ -351,12 +412,6 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 			} catch (final JsonProcessingException e) {
 				LOG.error("Cannot write tick message..", e);
 			}
-//		try {
-//			if (((ArithItem) solver.get("horizon")).getValue().leq(current_time)) {
-//				LOG.info("Nothing more to execute..");
-//				scheduled_feature.cancel(false);
-////			}
-//		}
 	}
 
 	@Override
@@ -439,8 +494,9 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 	}
 
 	@Override
+	
 	public synchronized void flawCreated(final long id, final long[] causes, final String label, final State state,
-										 final Bound position) {
+			final Bound position) {
 		final Flaw c_flaw = new Flaw(id,
 				Arrays.stream(causes).mapToObj(r_id -> resolvers.get(r_id)).toArray(Resolver[]::new), label, state,
 				position);
@@ -448,7 +504,7 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 		flaws.put(id, c_flaw);
 		try {
 			final String ws = UserController.ONLINE.get(lesson.getTeacher().getId());
-			if (ws != null)	      {
+			if (ws != null)          {
 				send.notify(Starter.mapper.writeValueAsString(new FlawCreated(lesson.getId(), id, causes, label, (byte) state.ordinal(), position)), ws);
 			}
 		} catch (final JsonProcessingException e) {
@@ -503,23 +559,6 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 	}
 
 
-//	@Override
-//	public void solutionFound() {
-//		LOG.info("Lesson \"{}\" planning problem solution found..", lesson.getName());
-//
-//		c_atoms.clear();
-//
-//		for (final Type t : solver.getTypes().values())
-//			for (final Predicate p : t.getPredicates().values())
-//				p.getInstances().stream().map(atm -> (Atom) atm)
-//						.filter(atm -> (atm.getState() == Atom.AtomState.Active))
-//						.forEach(atm -> c_atoms.put(atm.getSigma(), atm));
-//
-//
-//
-//
-//
-//	}
 
 
 	private static void to_string(final StringBuilder sb, final LessonEntity lesson_entity) {
@@ -591,23 +630,6 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 		sb.append("\n  predicate ").append("St_").append(rule_entity.getId()).append("(User u) : Interval {\n");
 		sb.append("    duration >= ").append(rule_entity.getLength()).append(".0;\n");
 		sb.append("    fact bt = new u.busy_time.Use(start:start, duration:duration, end:end, amount:1.0);\n");
-
-//	    		        for (final RuleEntity pre : rule_entity.getPreconditions()) {
-//	    		            sb.append("\n    {\n");
-//	    		            sb.append("      goal st").append(pre.getId()).append(" = new St_").append(pre.getId()).append("(u:u);\n");
-//	    		            if (rule_entity.isTopDown())
-//	    		                sb.append("      st").append(pre.getId()).append(".start >= end;\n");
-//	    		            else
-//	    		                sb.append("      st").append(pre.getId()).append(".end <= start;\n");
-//	    		            if(!pre.getTopics().isEmpty()) {
-//	    		            sb.append("    } or {\n");
-//	    		            for (String topic : pre.getTopics())
-//	    		                sb.append("      !u.").append(to_id(topic)).append(";\n");
-//	    		            sb.append("    }\n");
-//	    		        }else {
-//	    		        	sb.append("    }");
-//	    		        }
-//	    		        }
 		sb.append("  }\n");
 	}
 

@@ -29,7 +29,7 @@ function update() {
     case "4":
       document.getElementById("url").style.display = "none", document.getElementById("textarea").style.display = "none", document.getElementById("file").style.display = "block", text = "switch", type = "file";
   }
-}
+} 
 
 function checkAddNode(){
 	 send=true;

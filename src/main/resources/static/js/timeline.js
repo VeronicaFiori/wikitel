@@ -1,3 +1,6 @@
+//import { json } from "d3-fetch";
+
+
 let rows=[];
 let name;
 let user=null;
@@ -17,29 +20,53 @@ let one=true;
 	
        google.charts.load("current", {packages:["timeline"]});
     google.charts.setOnLoadCallback(drawChart);
-    
+  
+   
+   
  function drawChart() {
 		
 	
-		
+	/*rows =[];
 	
-		
-	
-	rows =[];
 	array.forEach(function(s) {
-         document.getElementById("lista_obiettivi").innerHTML+= '<li  id="b'+ s.arg+'"\>' +
-             '<span className="d-inline-block" tabIndex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" '+
-                   'data-bs-content="Clicca per vissualizzare la pagina Wikipedia">' +
+       document.getElementById("lista_obiettivi").innerHTML+= '<li  id="b'+ s.arg+'"\>' +
+            '<span className="d-inline-block" tabIndex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" '+
+                  'data-bs-content="Clicca per vissualizzare la pagina Wikipedia">' +
 
-             '<button  style="background:none;border:none;" onclick="wikilink(\'' + s.arg + '\')"><strong >'+ s.arg +'</strong></button></span>\n' +
-             '</li>';
-	rows.push(['rule', s.arg , new Date(0,0,0,0,0,s.from),new Date(0,0,0,0,0,s.to)  ])
-	});
-	if(u!=null){
-	var container = document.getElementById('timeline'+u);}
-	else{
-		var container = document.getElementById('timeline');
-	}
+            '<button  style="background:none;border:none;" onclick="wikilink(\'' + s.arg + '\')"><strong >'+ s.arg +'</strong></button></span>\n' +
+            '</li>';
+rows.push(['rule', s.arg , new Date(0,0,0,0,0,s.from),new Date(0,0,0,0,0,s.to)  ])
+}); */
+
+// MODIFICA
+rows = [];
+
+array.forEach(function(s) {
+	
+	 
+
+    var listItemContent = '';
+
+    // Aggiungi il contenuto dell'elemento lista con popover
+
+    listItemContent += '<li id="b' + s.arg + '">'+'<span className="d-inline-block" tabIndex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" ' + 
+     'data-bs-content="Clicca per visualizzare la pagina Wikipedia">';
+     listItemContent += '<button style="background:none;border:none;" <strong>' + s.arg + '</strong></button>';
+
+    listItemContent += '</span></li>';
+
+
+    document.getElementById("lista_obiettivi").innerHTML += listItemContent;
+;
+rows.push(['rule', s.arg , new Date(0,0,0,0,0,s.from),new Date(0,0,0,0,0,s.to)  ])
+});
+
+
+if(u!=null){
+var container = document.getElementById('timeline'+u);}
+else{
+    var container = document.getElementById('timeline');
+}
 
       console.log(container)
       

@@ -42,6 +42,33 @@
 		<link th:href="@{/css/success_modal.css}" rel="stylesheet">
 		<link th:href="@{/css/index.css}" rel="stylesheet">
 		<link th:href="@{/css/profile.css}" rel="stylesheet">
+  <script>
+        function generatePassword(length) {
+            var charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
+            var password = "";
+            for (var i = 0; i < length; i++) {
+                var randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset[randomIndex];
+            }
+            return password;
+        }
+
+        function suggestPassword() {
+            var passwordField = document.getElementById("password_r");
+            var suggestedPassword = generatePassword(12);
+            passwordField.value = suggestedPassword;
+            document.getElementById("suggestion").innerText = "Password suggerita: " + suggestedPassword;
+        }
+        function togglePasswordVisibility() {
+            var passwordField = document.getElementById("password_r");
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+            } else {
+                passwordField.type = "password";
+            }
+        }
+    </script>
+    
 </head>
 <style>
 :root{
@@ -279,6 +306,21 @@ body{
 .index:hover{
   box-shadow: .1rem 0rem var(--blue),
               0 .3rem .5rem rgba(0,0,0,.3);
+}
+ .password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+ .password-container input {
+  padding-right: 40px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
 }
 
 </style>
@@ -579,11 +621,17 @@ body{
                <div class="modal-split">
                  
                   <label for="email" class="col-form-label">Email:</label>
-            <input type="text" class="form-control" id="email_r" name="email_r">
-            <p id="error"></p>
-    <label for="password_r" class="col-form-label">Password:</label>
-            <input type="password" class="form-control" id="password_r" name="password_r" autocomplete="on">
-               </div>
+                  <input type="text" class="form-control" id="email_r" name="email_r">
+                  <p id="error"></p>
+            
+                  <label for="password_r" class="col-form-label">Password:</label>
+                  <div class="password-container">
+                     <input type="password" class="form-control" id="password_r" name="password_r" autocomplete="on">
+                     <span class="toggle-password" onclick="togglePasswordVisibility()">&#128065;</span>
+                  </div>
+                  <button type="button" class="btn btn-secondary my-3" onclick="suggestPassword()">SUGGERISCI PASSWORD SICURA</button>
+                 </div>
+      
                <div class="modal-split">
                  
                   <div class="role">

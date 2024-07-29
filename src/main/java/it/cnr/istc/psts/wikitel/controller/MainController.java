@@ -42,6 +42,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -530,7 +532,7 @@ public class MainController {
       System.out.println(n);
       System.out.println(LESSONS);
       if (LESSONS.get(n).getState() != LessonState.Running) {
-        //LESSONS.get(n).play();
+        LESSONS.get(n).play();
       }
     }
     else {
@@ -539,7 +541,7 @@ public class MainController {
         System.out.println(n);
         System.out.println(LESSONS);
         if (LESSONS.get(n).getState() != LessonState.Running) {
-          //LESSONS.get(n).play();
+          LESSONS.get(n).play();
         }
       }
     }

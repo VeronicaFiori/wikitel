@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -48,7 +49,6 @@ import it.cnr.istc.psts.wikitel.db.LessonEntity;
 import it.cnr.istc.psts.wikitel.db.ModelEntity;
 import it.cnr.istc.psts.wikitel.db.RuleEntity;
 import it.cnr.istc.psts.wikitel.db.UserEntity;
-import it.cnr.psts.wikitel.API.Lesson;
 
 
 
@@ -236,7 +236,7 @@ public class pageController {
 		System.out.println(lezione.getAsync());
 		System.out.println(credentials.getRole().equals("STUDENT"));
     	model.addAttribute("user",userentity);
-		if(lezione.getAsync() && credentials.getRole().equals("STUDENT")) {
+		if(lezione.getAsync() && credentials.getRole().equals("STUDENT")) {	
 			model.addAttribute("role", "controller");
 			System.out.println("USER:");
 		}
@@ -264,13 +264,30 @@ public class pageController {
 		}
 		model.addAttribute("goalsl",goals);
 		if(credentials.getRole().equals(STUDENT_ROLE)) { 
+			Json_reader interests = json("/json/user_model.json",true);
+//	        ArrayList<Interests> interestsSet = interests.getInterests();
+//
+//		    Iterator<RuleEntity> iterator = goals.iterator();
+//		    while (iterator.hasNext()) {
+//		        RuleEntity goal = iterator.next();
+//		        boolean matchesInterest = false;
+//		        for (String topic : goal.getTopics()) {
+//		            if (interestsSet.contains(topic)) {
+//		                matchesInterest = true;
+//		                break;
+//		            }
+//		        }
+//		        if (!matchesInterest) {
+//		            iterator.remove();
+//		        }
+//		    }
+	        
 
 			System.out.println("PROVA : " + MainController.LESSONS);
 		model.addAttribute("messages",MainController.LESSONS.get(n).getStimuli(userentity.getId()));
 
-		//send.notify(Starter.mapper.writeValueAsString(MainController.LESSONS.get(id).st), UserController.ONLINE.get(userentity.getId()));	
 		}
-	
+		//model.addAttribute("goalsl",goals);
 		
 		return "teachers/lezione";
 	}
