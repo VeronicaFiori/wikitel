@@ -22,10 +22,13 @@ import it.cnr.istc.psts.wikitel.db.*;
 import it.cnr.psts.wikitel.API.Lesson.LessonState;
 import it.cnr.psts.wikitel.API.Message;
 import net.bytebuddy.utility.RandomString;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.MessageHeaders;
@@ -43,7 +46,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -103,6 +105,12 @@ public class MainController {
   public Map<Long, ArrayList<String>> ricerca = new HashMap<>();
   
   public static final List<Long> newUsers = new ArrayList<>();
+
+  @Value("${url.chatbot}")
+  private String chatBotUrl;
+
+  @Value("${url.chatbot.apikey}")
+  private String chatBotKey;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -704,27 +712,27 @@ public class MainController {
       if (this.modelservice.getrulemongoname(name) == null) {
     	  ricerca.get(model.getId()).add(name);
     	    send.notify(Starter.mapper.writeValueAsString(new Message.Searching(name, 0)), UserController.ONLINE.get(nuovo.getId()));
-    	    Prova prova;
+    	    WikiRestResponse wikiRestResponse;
     	    try {
-         prova = restTemplate.getForObject("http://localhost:5015/wiki?page=" + name.replace(' ', '_'), Prova.class);
+         wikiRestResponse = restTemplate.getForObject("http://localhost:5015/wiki?page=" + name.replace(' ', '_'), WikiRestResponse.class);
     	    }
     	    catch(Exception e){
     	    	return new Response("Error","Python Server Error");
     	    }
     	    
-        if (prova.getExists()) {
-          ((WikiRuleEntity) rule).setUrl(prova.getUrl());
+        if (wikiRestResponse.getExists()) {
+          ((WikiRuleEntity) rule).setUrl(wikiRestResponse.getUrl());
           List < RuleSuggestionRelationEntity > relations = new ArrayList < > ();
 
           int i = -1;
-          for (String pre: prova.getPreconditions()) {
+          for (String pre: wikiRestResponse.getPreconditions()) {
             i++;
             SuggestionMongo sugmongo = new SuggestionMongo();
 
             sugmongo.setPage(pre);
 
-            sugmongo.setScore(Math.round((prova.getRank1().get(i).doubleValue()) * 100.0) / 100.0);
-            sugmongo.setScore2(Math.round((prova.getRank2().get(i).doubleValue()) * 100.0) / 100.0);
+            sugmongo.setScore(Math.round((wikiRestResponse.getRank1().get(i).doubleValue()) * 100.0) / 100.0);
+            sugmongo.setScore2(Math.round((wikiRestResponse.getRank2().get(i).doubleValue()) * 100.0) / 100.0);
 
             rulemongo.getSuggestions().add(sugmongo);
             sm.getSuggestion().add(sugmongo);
@@ -732,13 +740,13 @@ public class MainController {
           }
           this.modelservice.savesm(sm);
           rule.setSuggestion(sm.getId());
-          rule.setLength(prova.getLength());
-          rule.getTopics().addAll(prova.getCategories());
-          rulemongo.setLength(prova.getLength());
-          rulemongo.getTopics().addAll(prova.getCategories());
+          rule.setLength(wikiRestResponse.getLength());
+          rule.getTopics().addAll(wikiRestResponse.getCategories());
+          rulemongo.setLength(wikiRestResponse.getLength());
+          rulemongo.getTopics().addAll(wikiRestResponse.getCategories());
         } else {
-          System.out.println("ELEMENTO NON TROVATO PROVA CON " + prova.getSuggest() + " " + prova.getMaybe());
-          Response response = new Response(prova.getExists(), prova.getSuggest(), prova.getMaybe(),model.getId());
+          System.out.println("ELEMENTO NON TROVATO PROVA CON " + wikiRestResponse.getSuggest() + " " + wikiRestResponse.getMaybe());
+          Response response = new Response(wikiRestResponse.getExists(), wikiRestResponse.getSuggest(), wikiRestResponse.getMaybe(),model.getId());
           return response;
         }
       } else {
@@ -815,13 +823,19 @@ public class MainController {
     Response response = new Response("Exist");
 	return response;
 
-	 
+
 	 
   }
+  @RequestMapping(value = "/wikiQuestion/{id}", method = RequestMethod.GET)
+  public ArrayList<String> wikiQuestion(@PathVariable("id") Long id) {
+    RestTemplate restTemplate = new RestTemplate();
+    WikiQuestionResponse wikiQuestionResponse;
+    wikiQuestionResponse = restTemplate.getForObject("http://localhost:5015/wiki?page=" + name.replace(' ', '_'), WikiQuestionResponse.class);
 
+    return ricerca.get(id);
+  }
   @RequestMapping(value = "/ricerca/{id}", method = RequestMethod.POST)
   public ArrayList<String> ricerche(@PathVariable("id") Long id) {
-	  System.out.println("CIAOOOO");
 	  if(!ricerca.containsKey(id)) {
 		  return new ArrayList<>();
 	  }
@@ -1074,6 +1088,107 @@ public class MainController {
 
     return response;
 
+  }
+
+  @GetMapping("/generate")
+  public List<QuizQuestion>  generateQuestion() throws JsonProcessingException {
+    String basePrompt = "Create a high school - level quiz based on the provided text.\n"
+            + "You must strictly add here to the following format without any errors:\n"
+            +"[\n"
+            + "{\n"
+            + "    \"question\": \"*[ Insert the question ]*\",\n"
+            + "    \"options\": {\n"
+            + "        \"a\": \"*[ Option A ]*\",\n"
+            + "        \"b\": \"*[ Option B ]*\",\n"
+            + "        \"c\": \"*[ Option C ]*\",\n"
+            + "        \"d\": \"*[ Option D ]*\"\n"
+            + "    },\n"
+            + "    \"correct_answer\": \"*[Insert the letter corresponding to the correct answer, for example: 'a)']*\"\n"
+            + "},\n"
+            + "// ... more questions ..."
+            + "]\n"
+            + "Please note that you are allowed to modify only the parts within\n"
+            + "brackets (*[...]*) in the format provided.\n"
+            + "Ensure that all four options are distinct.\n"
+            + "When mentioning a date, please make sure to specify the year.\n"
+            + "The text is: \n";
+
+    String paragraph = "Il Palombaro lungo è la più grande cisterna idrica ipogea della città di Matera ed è situato sotto la pavimentazione di Piazza Vittorio Veneto, dove convergono le acque piovane e sorgive provenienti dalle colline di La Nera, Lapillo e Macamarda. Insieme ad altre cisterne ipogee forma la famosa Matera sotterranea; la cisterna fa parte di un sistema di raccolta delle acque che si estende per tutta la lunghezza dei sassi di Matera ed era necessario all'approvvigionamento dei suoi abitanti. Nell'area dei Sassi sono sempre state presenti delle cisterne ipogee, ma il Palombaro Lungo nasce dal collegamento di più grotte pre-esistenti nella zona in seguito all'aumento della popolazione e ai conseguenti lavori finalizzati alla costruzione di riserve idriche nel XVI secolo. La realizzazione della cisterna risale al XIX secolo, fu ultimata infatti nel 1882 su progetto dell'ingegner Rosi, anche se non è facile stabilire una datazione certa degli ambienti ipogei di piazza Vittorio Veneto a causa della presenza antichissima di abitanti negli ambienti caveosi materani[1].\n" +
+            "\n" +
+            "In passato l'area in cui si estende piazza Vittorio Veneto fu ricoperta da terra e detriti per facilitare l'edificazione e rassodare il precedente terreno argilloso, e difatti la piazza fa da spartiacque tra le abitazioni contadine nei Sassi e la parte cosiddetta \"al piano\", dimora delle famiglie borghesi. Dopo essere stato utilizzato per circa un secolo e mezzo come riserva idrica, smise di funzionare nel 1927[2] con l'arrivo dell'Acquedotto Pugliese che garantì rifornimento idrico alla città e rese superfluo l'uso del Palombaro Lungo.\n" +
+            "\n" +
+            "Il Palombaro è stato riscoperto nel 1991 da un gruppo di studiosi, guidati da Enzo Viti, tecnico disegnatore, esperto di Matera Sotterranea[3], che al momento della scoperta attraversò la cisterna a bordo di un gommone; tale scoperta contribuì a far diventare i Sassi di Matera patrimonio mondiale dell'UNESCO[4].";
+    ObjectNode jsonObject = chatBotRest(basePrompt, paragraph);
+    return getQuestionAnswer(jsonObject.get("choices").get(0).toString());
+  }
+
+  private ObjectNode chatBotRest(String basePrompt, String paragraph) {
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    QuestionGeneratorRequest questionGeneratorRequest = new QuestionGeneratorRequest();
+    headers.set("Authorization", "Bearer " + chatBotKey);
+    questionGeneratorRequest.setTemperature(0.5);
+    questionGeneratorRequest.setModel("meta-llama/llama-3.1-8b-instruct");
+    Messages messages = new Messages();
+    messages.setRole("user");
+    messages.setContent(basePrompt + paragraph);
+    questionGeneratorRequest.getMessages().add(messages);
+    HttpEntity<QuestionGeneratorRequest> request = new HttpEntity<>(questionGeneratorRequest, headers);
+    ObjectNode jsonObject = restTemplate.postForObject(chatBotUrl, request, ObjectNode.class);
+    return jsonObject;
+  }
+
+  public List<QuizQuestion> getQuestionAnswer(String text) throws JsonProcessingException {
+
+    JSONObject jsonObject = new JSONObject(text);
+    JSONObject message = jsonObject.getJSONObject("message");
+    String  content = message.getString("content");
+    String json = extractJSON(content);
+    ObjectMapper mapper = new ObjectMapper();
+    List<QuizQuestion> questions = mapper.readValue(json, new TypeReference<List<QuizQuestion>>(){});
+    return questions;
+  }
+
+  public static String extractJSON(String text) {
+    StringBuilder jsonBlocks = new StringBuilder();
+    int openBraces = 0;
+    boolean insideJson = false;
+    boolean parentesiQuadra = true;
+    StringBuilder currentJsonBlock = new StringBuilder();
+
+    for (char c : text.toCharArray()) {
+      if (c == '[' && parentesiQuadra) {
+        openBraces++;
+        insideJson = true;
+      }
+      if (c == '{') {
+        openBraces++;
+        insideJson = true;
+      }
+
+      if (insideJson) {
+        currentJsonBlock.append(c);
+      }
+
+      if (c == '}' || (c == ']' && parentesiQuadra)) {
+        openBraces--;
+        if (openBraces == 0 && insideJson) {
+          insideJson = false;
+          if (parentesiQuadra && c!= ']')
+            jsonBlocks.append(currentJsonBlock.toString().trim()).append(",\n");
+          else
+            jsonBlocks.append(currentJsonBlock.toString().trim()).append("\n");
+          currentJsonBlock.setLength(0);  // Reset the StringBuilder for the next JSON block
+        }
+      }
+
+      if (c == ']') {
+        parentesiQuadra = false;
+      }
+
+    }
+
+    return jsonBlocks.toString().trim();
   }
 
   

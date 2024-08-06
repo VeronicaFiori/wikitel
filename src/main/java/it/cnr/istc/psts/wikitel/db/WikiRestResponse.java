@@ -1,11 +1,11 @@
 package it.cnr.istc.psts.wikitel.db;
 
+import lombok.Data;
+
 import java.util.List;
 import java.util.Set;
-
-import lombok.Data;
 @Data
-public class Prova {
+public class WikiRestResponse {
 
 	private Set<String> categories;
 	private long length;
