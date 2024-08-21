@@ -277,7 +277,55 @@ textarea {
     top: 2px;
 
 }
+#quiz-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
 
+.question-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.question-card h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.options-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.options-list li {
+    margin-bottom: 10px;
+}
+
+.options-list li label.selected {
+    background-color: #e6e6e6;
+}
+.options-list li label {
+    padding: 10px;
+    display: block;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.options-list li label:hover {
+    background-color: #e6e6e6;
+}
+
+.options-list li.correct label {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
 </style>
 <script>
 function openNav() {
@@ -294,7 +342,56 @@ function wikilink(a){
     console.log(a)
     window.open("https://it.wikipedia.org/wiki/" + a, "_blank");
 }
+function generateQuiz(){
+    $.ajax({
+        type: "GET", contentType: "application/json", url: "/generate?rule=palombaro lungo", success: function (a) {
+            console.log("SUCCESS : ", a);
+            const quizContainer = document.getElementById('quiz-container');
 
+            a.forEach((item, index) => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+
+                const questionTitle = document.createElement('h2');
+                questionTitle.textContent = `${index + 1}. ${item.question}`;
+                questionCard.appendChild(questionTitle);
+
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options-list';
+
+                for (let key in item.options) {
+                    const optionItem = document.createElement('li');
+                    // if (key === item.correct_answer) {
+                    //     optionItem.className = 'correct';
+                    // }
+
+                    const optionLabel = document.createElement('label');
+                    optionLabel.textContent = `${key.toUpperCase()}: ${item.options[key]}`;
+                    optionItem.appendChild(optionLabel);
+                    optionsList.appendChild(optionItem);
+                }
+
+                questionCard.appendChild(optionsList);
+                quizContainer.appendChild(questionCard);
+                const listItems = document.querySelectorAll('.options-list li');
+
+                // Aggiungi un event listener per ogni elemento li
+                listItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        // Rimuovi la classe 'selected' da tutti gli elementi
+                        listItems.forEach(li => li.classList.remove('selected'));
+
+                        // Aggiungi la classe 'selected' all'elemento cliccato
+                        this.classList.add('selected');
+                    });
+                });
+            });
+        }, error: function (a) {
+            alert("Error! " + a);
+            console.log("ERROR: ", a);
+        }
+    });
+}
 </script>
 <body>
 <div hidden="true" id="nameid" th:value="${user.id}"></div>
@@ -416,6 +513,7 @@ function wikilink(a){
    <div id="timeline" style="height: 150px;"></div>
   
   </div>
+         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quizModal">
   
   <button type="button" class="btn btn-primary" th:if="${roles}=='STUDENT'" data-bs-toggle="modal" data-bs-target="#stimulo">
   Visualizza la lezione
@@ -434,8 +532,10 @@ function wikilink(a){
                         	<h5 class="card-title">Upcoming events</h5>
       <p class="card-text">There are no upcoming events</p>
        <a href="#" class="card-link">Go to calendar...</a>
-      <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p></div>                       
-                </div>              
+      <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p></div>
+                    <button type="button" class="btn btn-secondary my-3" onclick="generateQuiz()">Generate Quiz</button>
+
+                </div>
             </div>
         </div>
     </div>
@@ -501,12 +601,8 @@ function wikilink(a){
   </div>
 </div>
 
-
-  
-  
-  
   <div class="rows" id="rows">
-  
+
 </div></div>
 </div>
 
@@ -546,6 +642,25 @@ function wikilink(a){
     </div>
   </div>
 </div>
+<div class="modal fade" id="quizModal" tabindex="-1" aria-labelledby="quizModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="quizModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="quiz-container"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 <div class="modal fade" id="stimulo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-fullscreen">

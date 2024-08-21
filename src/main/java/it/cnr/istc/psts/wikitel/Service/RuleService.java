@@ -1,18 +1,7 @@
 package it.cnr.istc.psts.wikitel.Service;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-
 import it.cnr.istc.psts.Websocket.Sending;
 import it.cnr.istc.psts.wikitel.Mongodb.SuggestionM;
 import it.cnr.istc.psts.wikitel.Mongodb.SuggestionMongo;
@@ -23,6 +12,15 @@ import it.cnr.istc.psts.wikitel.db.LessonEntity;
 import it.cnr.istc.psts.wikitel.db.ModelEntity;
 import it.cnr.istc.psts.wikitel.db.RuleEntity;
 import it.cnr.istc.psts.wikitel.db.UserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RuleService {
@@ -91,7 +89,7 @@ public class RuleService {
 					System.out.println(ef);
 					ef.removePrecondition(rule);
 					
-					SuggestionM sm =  this.modelservice.getsuggestion(ef.getSuggestions());
+					SuggestionM sm =  this.modelservice.getSuggestion(ef.getSuggestions());
 					   SuggestionMongo sugmongo = new SuggestionMongo();
 
 			            sugmongo.setPage(rule.getName());
@@ -99,7 +97,7 @@ public class RuleService {
 			            sugmongo.setScore((double) 0.5);
 			            sugmongo.setScore2((double) 0.5);
 			            sm.getSuggestion().add(sugmongo);
-			            this.modelservice.savesm(sm);
+			            this.modelservice.saveSuggestionMongo(sm);
 					this.saverule(ef);
 				}
 				rule.getPreconditions().clear();

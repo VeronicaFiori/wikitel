@@ -10,9 +10,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.cnr.istc.psts.Websocket.Sending;
 import it.cnr.istc.psts.wikitel.MongoRepository.RuleMongoRepository;
-import it.cnr.istc.psts.wikitel.Mongodb.RuleMongo;
-import it.cnr.istc.psts.wikitel.Mongodb.SuggestionM;
-import it.cnr.istc.psts.wikitel.Mongodb.SuggestionMongo;
+import it.cnr.istc.psts.wikitel.Mongodb.*;
 import it.cnr.istc.psts.wikitel.Repository.ModelRepository;
 import it.cnr.istc.psts.wikitel.Repository.Response;
 import it.cnr.istc.psts.wikitel.Repository.RuleRepository;
@@ -45,7 +43,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -115,6 +112,8 @@ public class MainController {
   @Autowired
   private ObjectMapper objectMapper;
 
+  @Autowired
+  private QuizQuestionService quizQuestionService;
   public static final Map < String, LessonManager > LESSONS = new HashMap < > ();
 
   @PostMapping("/register")
@@ -208,7 +207,7 @@ public class MainController {
       rule.setId(r.getId());
       rule.setName(r.getName());
       if (r.getSuggestions() != null)
-        sug = this.modelservice.getsuggestion(r.getSuggestions()).getSuggestion();
+        sug = this.modelservice.getSuggestion(r.getSuggestions()).getSuggestion();
       Collections.sort(sug);
       rule.getSuggestionm().addAll(sug);
       re.add(rule);
@@ -277,7 +276,7 @@ public class MainController {
       rule.setId(r.getId());
       rule.setName(r.getName());
       if (r.getSuggestions() != null)
-        rule.getSuggestionm().addAll(this.modelservice.getsuggestion(r.getSuggestions()).getSuggestion());
+        rule.getSuggestionm().addAll(this.modelservice.getSuggestion(r.getSuggestions()).getSuggestion());
       re.add(rule);
       List < Double > max = new ArrayList < > ();
       for (SuggestionMongo sm: rule.getSuggestionm()) {
@@ -644,7 +643,7 @@ public class MainController {
   public Boolean checkName(ModelEntity m, String name) {
 	for(RuleEntity r : m.getRules()) {
 		if(r instanceof WikiRuleEntity ) {
-		List<SuggestionMongo> s = this.modelservice.getsuggestion(r.getSuggestions()).getSuggestion();
+		List<SuggestionMongo> s = this.modelservice.getSuggestion(r.getSuggestions()).getSuggestion();
 		 for(SuggestionMongo sm : s) {
 			 if(sm.getPage().equals(name) || r.getName().equals(name))
 				 return false;
@@ -709,7 +708,7 @@ public class MainController {
     case "Pagina Wikipedia":
       rule = new WikiRuleEntity();
       SuggestionM sm = new SuggestionM();
-      if (this.modelservice.getrulemongoname(name) == null) {
+      if (this.modelservice.getRuleMongoByTitle(name)== null) {
     	  ricerca.get(model.getId()).add(name);
     	    send.notify(Starter.mapper.writeValueAsString(new Message.Searching(name, 0)), UserController.ONLINE.get(nuovo.getId()));
     	    WikiRestResponse wikiRestResponse;
@@ -738,12 +737,13 @@ public class MainController {
             sm.getSuggestion().add(sugmongo);
 
           }
-          this.modelservice.savesm(sm);
+          this.modelservice.saveSuggestionMongo(sm);
           rule.setSuggestion(sm.getId());
           rule.setLength(wikiRestResponse.getLength());
           rule.getTopics().addAll(wikiRestResponse.getCategories());
           rulemongo.setLength(wikiRestResponse.getLength());
           rulemongo.getTopics().addAll(wikiRestResponse.getCategories());
+          rulemongo.setPlain_text(wikiRestResponse.getPlain_text());
         } else {
           System.out.println("ELEMENTO NON TROVATO PROVA CON " + wikiRestResponse.getSuggest() + " " + wikiRestResponse.getMaybe());
           Response response = new Response(wikiRestResponse.getExists(), wikiRestResponse.getSuggest(), wikiRestResponse.getMaybe(),model.getId());
@@ -753,7 +753,7 @@ public class MainController {
         bool = false;
         System.out.println("non sono entrato");
         List < RuleSuggestionRelationEntity > relations = new ArrayList < > ();
-        RuleMongo m = this.modelservice.getrulemongoname(name);
+        RuleMongo m = this.modelservice.getRuleMongoByTitle(name);
         rule.setLength(m.getLength());
         rule.setName(name);
         for (SuggestionMongo s: m.getSuggestions()) {
@@ -761,7 +761,7 @@ public class MainController {
 
         }
 
-        this.modelservice.savesm(sm);
+        this.modelservice.saveSuggestionMongo(sm);
         rule.setSuggestion(sm.getId());
         rule.getTopics().addAll(m.getTopics());
         ((WikiRuleEntity) rule).setUrl("https://it.wikipedia.org/wiki/" + name);
@@ -793,13 +793,13 @@ public class MainController {
 
       if (effect_entity instanceof WikiRuleEntity) {
         System.out.println("sono qui!!");
-        SuggestionM sm = this.modelservice.getsuggestion(effect_entity.getSuggestions());
+        SuggestionM sm = this.modelservice.getSuggestion(effect_entity.getSuggestions());
         Optional < SuggestionMongo > relation = sm.getSuggestion().stream()
           .filter(s -> s.getPage().equalsIgnoreCase(name)).findAny();
         relation.ifPresent(rel -> {
           System.out.println(rel);
           sm.getSuggestion().remove(rel);
-          this.modelservice.savesm(sm);
+          this.modelservice.saveSuggestionMongo(sm);
         });
       }
       this.ruleservice.saverule(effect_entity);
@@ -826,14 +826,14 @@ public class MainController {
 
 	 
   }
-  @RequestMapping(value = "/wikiQuestion/{id}", method = RequestMethod.GET)
-  public ArrayList<String> wikiQuestion(@PathVariable("id") Long id) {
-    RestTemplate restTemplate = new RestTemplate();
-    WikiQuestionResponse wikiQuestionResponse;
-    wikiQuestionResponse = restTemplate.getForObject("http://localhost:5015/wiki?page=" + name.replace(' ', '_'), WikiQuestionResponse.class);
-
-    return ricerca.get(id);
-  }
+//  @RequestMapping(value = "/wikiQuestion/{id}", method = RequestMethod.GET)
+//  public ArrayList<String> wikiQuestion(@PathVariable("id") Long id) {
+//    RestTemplate restTemplate = new RestTemplate();
+//    WikiQuestionResponse wikiQuestionResponse;
+//    wikiQuestionResponse = restTemplate.getForObject("http://localhost:5015/wiki?page=" + name.replace(' ', '_'), WikiQuestionResponse.class);
+//
+//    return ricerca.get(id);
+//  }
   @RequestMapping(value = "/ricerca/{id}", method = RequestMethod.POST)
   public ArrayList<String> ricerche(@PathVariable("id") Long id) {
 	  if(!ricerca.containsKey(id)) {
@@ -915,20 +915,34 @@ public class MainController {
     lesson.setTeacher(nuovo);
     //List<Integer> goals = mapper.readValue(node.get("goals").asText(), List.class);
     List < Long > goals = mapper.readValue(node.get("goals").asText(), new TypeReference < List < Long >> () {});
-    for (Long g: goals) {
-      System.out.println("ID " + Long.valueOf(g));
-      lesson.getGoals().add(this.ruleservice.getRule(Long.valueOf(g)));
-    }
+
 
     Boolean b = false;
     if(node.get("type").asInt() == 1)
       b=true;
     System.out.println("User subscribe :  " + b);
     lesson.setAsync(b);
-    lessonservice.save(lesson);
+    lesson = lessonservice.save(lesson);
     nuovo.getTeaching_lessons().add(lesson);
     userservice.saveUser(nuovo);
-    Response response = new Response("Ciao", lesson);
+    for (Long g: goals) {
+      System.out.println("ID " + Long.valueOf(g));
+      RuleEntity rule = this.ruleservice.getRule(Long.valueOf(g));
+      lesson.getGoals().add(rule);
+      if(!this.quizQuestionService.existsQuizQuestionList(rule.getId())) {
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              generateQuestion(rule.getName(), rule.getId());
+            } catch (JsonProcessingException e) {
+              throw new RuntimeException(e);
+            }
+          }
+        }).start();
+      }
+    }
+    Response response = new Response("Newlesson", lesson);
 
     long[] map = Starter.mapper.readValue(node.get("students").asText(), long[].class);
     List < UserEntity > u = new ArrayList < > ();
@@ -1042,7 +1056,7 @@ public class MainController {
   @GetMapping("/json")
   public RuleMongo Getstudentsds() {
 
-    return this.modelservice.getrulemongoname("piramide");
+    return this.modelservice.getRuleMongoByTitle("piramide");
 
   }
 
@@ -1091,8 +1105,10 @@ public class MainController {
   }
 
   @GetMapping("/generate")
-  public List<QuizQuestion>  generateQuestion() throws JsonProcessingException {
-    String basePrompt = "Create a high school - level quiz based on the provided text.\n"
+  public List<QuizQuestion>  generateQuestion(@RequestParam(value = "rule", required = false) String rule) throws JsonProcessingException {
+    List<QuizQuestion>  quizQuestionList = new ArrayList<>();
+    RuleMongo ruleMongo = this.modelservice.getRuleMongoByTitle(rule);
+    String basePrompt = "Create 10 high school - italian level quiz based on the provided text.\n"
             + "You must strictly add here to the following format without any errors:\n"
             +"[\n"
             + "{\n"
@@ -1103,7 +1119,9 @@ public class MainController {
             + "        \"c\": \"*[ Option C ]*\",\n"
             + "        \"d\": \"*[ Option D ]*\"\n"
             + "    },\n"
-            + "    \"correct_answer\": \"*[Insert the letter corresponding to the correct answer, for example: 'a)']*\"\n"
+            +"     \"source\": \"*[Write the exact line or passage from the provided text \n" +
+            "where the information for this question can be found.]*\",\n"
+            + "    \"correct_answer\": \"*[Insert the letter corresponding to the correct answer, for example: 'c)']*\"\n"
             + "},\n"
             + "// ... more questions ..."
             + "]\n"
@@ -1113,13 +1131,79 @@ public class MainController {
             + "When mentioning a date, please make sure to specify the year.\n"
             + "The text is: \n";
 
-    String paragraph = "Il Palombaro lungo è la più grande cisterna idrica ipogea della città di Matera ed è situato sotto la pavimentazione di Piazza Vittorio Veneto, dove convergono le acque piovane e sorgive provenienti dalle colline di La Nera, Lapillo e Macamarda. Insieme ad altre cisterne ipogee forma la famosa Matera sotterranea; la cisterna fa parte di un sistema di raccolta delle acque che si estende per tutta la lunghezza dei sassi di Matera ed era necessario all'approvvigionamento dei suoi abitanti. Nell'area dei Sassi sono sempre state presenti delle cisterne ipogee, ma il Palombaro Lungo nasce dal collegamento di più grotte pre-esistenti nella zona in seguito all'aumento della popolazione e ai conseguenti lavori finalizzati alla costruzione di riserve idriche nel XVI secolo. La realizzazione della cisterna risale al XIX secolo, fu ultimata infatti nel 1882 su progetto dell'ingegner Rosi, anche se non è facile stabilire una datazione certa degli ambienti ipogei di piazza Vittorio Veneto a causa della presenza antichissima di abitanti negli ambienti caveosi materani[1].\n" +
-            "\n" +
-            "In passato l'area in cui si estende piazza Vittorio Veneto fu ricoperta da terra e detriti per facilitare l'edificazione e rassodare il precedente terreno argilloso, e difatti la piazza fa da spartiacque tra le abitazioni contadine nei Sassi e la parte cosiddetta \"al piano\", dimora delle famiglie borghesi. Dopo essere stato utilizzato per circa un secolo e mezzo come riserva idrica, smise di funzionare nel 1927[2] con l'arrivo dell'Acquedotto Pugliese che garantì rifornimento idrico alla città e rese superfluo l'uso del Palombaro Lungo.\n" +
-            "\n" +
-            "Il Palombaro è stato riscoperto nel 1991 da un gruppo di studiosi, guidati da Enzo Viti, tecnico disegnatore, esperto di Matera Sotterranea[3], che al momento della scoperta attraversò la cisterna a bordo di un gommone; tale scoperta contribuì a far diventare i Sassi di Matera patrimonio mondiale dell'UNESCO[4].";
-    ObjectNode jsonObject = chatBotRest(basePrompt, paragraph);
-    return getQuestionAnswer(jsonObject.get("choices").get(0).toString());
+    String paragraph = ruleMongo.getPlain_text();
+    boolean validResult = true;
+    while (validResult) {
+      LOG.info("START----------GENERATE QUIZ------------------");
+      try {
+        LOG.info("START----------chatBotRest------------------");
+        ObjectNode jsonObject = chatBotRest(basePrompt, paragraph);
+        LOG.info("FINISH----------chatBotRest------------------");
+        LOG.info("START----------Formatting question------------------");
+        quizQuestionList = getQuestionAnswer(jsonObject.get("choices").get(0).toString());
+        LOG.info("FINISH----------Formatting question------------------");
+        validResult = false;
+      } catch (Exception e) {
+        LOG.error("------------ERROR RETRY JSON PARSING------------");
+      }
+    }
+    LOG.info("FINISH----------GENERATE QUIZ------------------");
+
+    return quizQuestionList;
+  }
+
+
+
+  public QuizQuestionList  generateQuestion(String ruleName, Long ruleId) throws JsonProcessingException {
+    QuizQuestionList quizQuestionList = new QuizQuestionList();
+    List<QuizQuestion> questionsanswer = new ArrayList<QuizQuestion>();
+    RuleMongo ruleMongo = this.modelservice.getRuleMongoByTitle(ruleName);
+    String basePrompt = "Create 10 high school - italian level quiz based on the provided text.\n"
+            + "You must strictly add here to the following format without any errors:\n"
+            +"[\n"
+            + "{\n"
+            + "    \"question\": \"*[ Insert the question ]*\",\n"
+            + "    \"options\": {\n"
+            + "        \"a\": \"*[ Option A ]*\",\n"
+            + "        \"b\": \"*[ Option B ]*\",\n"
+            + "        \"c\": \"*[ Option C ]*\",\n"
+            + "        \"d\": \"*[ Option D ]*\"\n"
+            + "    },\n"
+            +"     \"source\": \"*[Write the exact line or passage from the provided text \n" +
+            "where the information for this question can be found.]*\",\n"
+            + "    \"correct_answer\": \"*[Insert the letter corresponding to the correct answer, for example: 'c)']*\"\n"
+            + "},\n"
+            + "// ... more questions ..."
+            + "]\n"
+            + "Please note that you are allowed to modify only the parts within\n"
+            + "brackets (*[...]*) in the format provided.\n"
+            + "Ensure that all four options are distinct.\n"
+            + "When mentioning a date, please make sure to specify the year.\n"
+            + "The text is: \n";
+
+    String paragraph = ruleMongo.getPlain_text();
+    boolean validResult = true;
+    while (validResult) {
+      LOG.info("START----------GENERATE QUIZ------------------");
+      try {
+        LOG.info("START----------chatBotRest------------------");
+        ObjectNode jsonObject = chatBotRest(basePrompt, paragraph);
+        LOG.info("FINISH----------chatBotRest------------------");
+        LOG.info("START----------Formatting question------------------");
+        questionsanswer = getQuestionAnswer(jsonObject.get("choices").get(0).toString());
+        LOG.info("FINISH----------Formatting question------------------");
+        validResult = false;
+      } catch (Exception e) {
+        LOG.error("------------ERROR RETRY JSON PARSING------------");
+      }
+    }
+    LOG.info("FINISH----------GENERATE QUIZ------------------");
+    quizQuestionList.setRuleId(ruleId);
+    quizQuestionList.setQuizQuestions(questionsanswer);
+    this.quizQuestionService.save(quizQuestionList);
+    LOG.info("---------------SAVED NEW QUIZZ FOR RULE " + ruleId +" ---------------");
+
+    return quizQuestionList;
   }
 
   private ObjectNode chatBotRest(String basePrompt, String paragraph) {
@@ -1143,7 +1227,9 @@ public class MainController {
     JSONObject jsonObject = new JSONObject(text);
     JSONObject message = jsonObject.getJSONObject("message");
     String  content = message.getString("content");
-    String json = extractJSON(content);
+    String json = null;
+    System.out.println(content);
+        json = extractJSON(content);
     ObjectMapper mapper = new ObjectMapper();
     List<QuizQuestion> questions = mapper.readValue(json, new TypeReference<List<QuizQuestion>>(){});
     return questions;

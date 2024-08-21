@@ -16,4 +16,5 @@ public class WikiRestResponse {
 	private Boolean exists;
 	private String suggest;
 	private List<String> maybe;
+	private String plain_text;
 }

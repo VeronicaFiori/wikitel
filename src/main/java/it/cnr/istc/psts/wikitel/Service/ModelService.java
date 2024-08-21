@@ -1,33 +1,24 @@
 package it.cnr.istc.psts.wikitel.Service;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import it.cnr.istc.psts.wikitel.MongoRepository.RuleMongoRepository;
 import it.cnr.istc.psts.wikitel.MongoRepository.SuggestionMRepository;
 import it.cnr.istc.psts.wikitel.Mongodb.RuleMongo;
 import it.cnr.istc.psts.wikitel.Mongodb.SuggestionM;
 import it.cnr.istc.psts.wikitel.Repository.ModelRepository;
-import it.cnr.istc.psts.wikitel.Repository.RuleRepository;
-import it.cnr.istc.psts.wikitel.Repository.RuleSuggestionRelationRepository;
 import it.cnr.istc.psts.wikitel.Repository.WikiSuggestionRepository;
-import it.cnr.istc.psts.wikitel.controller.LessonManager;
 import it.cnr.istc.psts.wikitel.controller.MainController;
 import it.cnr.istc.psts.wikitel.db.LessonEntity;
 import it.cnr.istc.psts.wikitel.db.ModelEntity;
-import it.cnr.istc.psts.wikitel.db.RuleEntity;
-import it.cnr.istc.psts.wikitel.db.RuleSuggestionRelationEntity;
 import it.cnr.istc.psts.wikitel.db.UserEntity;
 import it.cnr.istc.psts.wikitel.db.WikiSuggestionEntity;
-import net.bytebuddy.asm.Advice.OffsetMapping.ForOrigin.Renderer.ForReturnTypeName;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ModelService {
@@ -57,18 +48,18 @@ public class ModelService {
 	
 	 
 		@Transactional
-	    public SuggestionM savesm(SuggestionM sm) {
+	    public SuggestionM saveSuggestionMongo(SuggestionM sm) {
 	        return this.suggestionm.save(sm);
 	    }
 		
 		 @Transactional
-			public SuggestionM getsuggestion(String id) {
+			public SuggestionM getSuggestion(String id) {
 				Optional<SuggestionM> result  = this.suggestionm.findById(id);
 				return result.orElse(null);
 			}
 	 
 	 @Transactional
-		public RuleMongo getrulemongoname(String id) {
+		public RuleMongo getRuleMongoByTitle(String id) {
 			Optional<RuleMongo> result  = this.rulemongorep.findByTitle(id);
 			return result.orElse(null);
 		}
