@@ -1,27 +1,21 @@
 package it.cnr.istc.psts.wikitel.controller;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import it.cnr.istc.psts.Websocket.Sending;
-import it.cnr.istc.psts.wikitel.MongoRepository.RuleMongoRepository;
-import it.cnr.istc.psts.wikitel.Mongodb.RuleMongo;
-import it.cnr.istc.psts.wikitel.Mongodb.SuggestionM;
-import it.cnr.istc.psts.wikitel.Mongodb.SuggestionMongo;
-import it.cnr.istc.psts.wikitel.Repository.ModelRepository;
-import it.cnr.istc.psts.wikitel.Repository.Response;
-import it.cnr.istc.psts.wikitel.Repository.RuleRepository;
-import it.cnr.istc.psts.wikitel.Repository.UserRepository;
-import it.cnr.istc.psts.wikitel.Service.*;
-import it.cnr.istc.psts.wikitel.db.*;
-import it.cnr.psts.wikitel.API.Lesson.LessonState;
-import it.cnr.psts.wikitel.API.Message;
-import net.bytebuddy.utility.RandomString;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,18 +30,59 @@ import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.*;
+import it.cnr.istc.psts.Websocket.Sending;
+import it.cnr.istc.psts.wikitel.MongoRepository.RuleMongoRepository;
+import it.cnr.istc.psts.wikitel.Mongodb.RuleMongo;
+import it.cnr.istc.psts.wikitel.Mongodb.SuggestionM;
+import it.cnr.istc.psts.wikitel.Mongodb.SuggestionMongo;
+import it.cnr.istc.psts.wikitel.Repository.ModelRepository;
+import it.cnr.istc.psts.wikitel.Repository.Response;
+import it.cnr.istc.psts.wikitel.Repository.RuleRepository;
+import it.cnr.istc.psts.wikitel.Repository.UserRepository;
+import it.cnr.istc.psts.wikitel.Service.CredentialService;
+import it.cnr.istc.psts.wikitel.Service.FilesService;
+import it.cnr.istc.psts.wikitel.Service.LessonService;
+import it.cnr.istc.psts.wikitel.Service.ModelService;
+import it.cnr.istc.psts.wikitel.Service.RuleService;
+import it.cnr.istc.psts.wikitel.Service.RuleSuggestionRelationService;
+import it.cnr.istc.psts.wikitel.Service.Starter;
+import it.cnr.istc.psts.wikitel.Service.UserService;
+import it.cnr.istc.psts.wikitel.db.Credentials;
+import it.cnr.istc.psts.wikitel.db.FileRuleEntity;
+import it.cnr.istc.psts.wikitel.db.Files;
+import it.cnr.istc.psts.wikitel.db.LessonEntity;
+import it.cnr.istc.psts.wikitel.db.Model;
+import it.cnr.istc.psts.wikitel.db.ModelEntity;
+import it.cnr.istc.psts.wikitel.db.Prova;
+import it.cnr.istc.psts.wikitel.db.RuleEntity;
+import it.cnr.istc.psts.wikitel.db.RuleSuggestionRelationEntity;
+import it.cnr.istc.psts.wikitel.db.TextRuleEntity;
+import it.cnr.istc.psts.wikitel.db.User;
+import it.cnr.istc.psts.wikitel.db.UserEntity;
+import it.cnr.istc.psts.wikitel.db.WebRuleEntity;
+import it.cnr.istc.psts.wikitel.db.WikiRuleEntity;
+import it.cnr.psts.wikitel.API.Lesson.LessonState;
+import it.cnr.psts.wikitel.API.Message;
+import net.bytebuddy.utility.RandomString;
 
 ;
 
@@ -209,7 +244,10 @@ public class MainController {
     return re;
   }
 
-  @PostMapping("/findsuggestiontot")
+
+
+
+@PostMapping("/findsuggestiontot")
   public List < Set < ObjectNode >> GetSuggestiontot(@RequestBody ObjectNode node) {
     System.out.println(node.get("ids").asLong());
     ModelEntity model = this.modelservice.getModel(node.get("ids").asLong());
@@ -409,6 +447,9 @@ public class MainController {
 
     rule.setName(m.getName());
     rule.setLength((long) time);
+    
+   
+
     this.ruleservice.saverule(rule);
     this.m.addRule(rule);
     this.modelservice.save(m);
@@ -427,6 +468,7 @@ public class MainController {
     uploadfile.transferTo(new File(baseDir + file1));
     RuleEntity rule = new FileRuleEntity();
     ((FileRuleEntity) rule).setSrc(baseDir + file1);
+    
     this.ruleservice.saverule(rule);
     Fileid = rule.getId();
     return rule.getId();
@@ -522,7 +564,7 @@ public class MainController {
   }
 
   @PostMapping("/play")
-  public Response PlayLesson(@RequestBody ObjectNode node) throws IllegalStateException, IOException {
+  public /*Response*/ResponseEntity<?> PlayLesson(@RequestBody ObjectNode node) throws IllegalStateException, IOException {
     LessonEntity lesson = this.lessonservice.lezionePerId(node.get("id").asLong());
     if( lesson.getAsync()){
       UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -545,8 +587,12 @@ public class MainController {
         }
       }
     }
-    Response response = new Response("Done");
-    return response;
+//    Response response = new Response("Done");
+//    return response;
+    String name = node.get("name").asText();
+
+    String wikipediaUrl = "https://it.wikipedia.org/wiki/" + name.replace(' ', '_');
+    return ResponseEntity.ok(Collections.singletonMap("wikipediaUrl", wikipediaUrl));
 
   }
   @PostMapping("/pause")

@@ -1,9 +1,11 @@
 package it.cnr.istc.psts.wikitel.db;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 import lombok.Data;
 
@@ -33,5 +35,21 @@ public class Files {
 	private String name;
 	
 	private String src;
+	
+	/*PROVA*/
+	private byte[] bytes;
+
+	
+//	@Lob
+//    @Column(nullable = false)
+//    private byte[] content;
+//	
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public void setContent(byte[] bytes) {
+        this.bytes = bytes;
+    }
 
 }

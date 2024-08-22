@@ -194,6 +194,9 @@ function openNav() {
 
 
 </script>
+
+
+
 <body>
 <div hidden="true" id="nameid" th:value="${user.id}"></div>
 <nav class="navbar navbar-expand-lg navbar-light bg-light" style="z-index: 1030;">
@@ -288,8 +291,17 @@ function openNav() {
                 <div class="mt-5">
                     <a style="font-size: 19px;" class="h2" th:href="@{'/lezione/' +${l.id}} " th:text="${l.name}"></a>
                     <div class="mt-5">
+						
                         <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                          <div class="progress-bar" role="progressbar"
+                               th:style="'width: ' + (${progressMap[l.id.toString()] != null} ? ${progressMap[l.id.toString()].percentage} : 0) + '%'"
+                               th:attr="aria-valuenow=${progressMap[l.id.toString()] != null ? progressMap[l.id.toString()].percentage : 0}"
+                               aria-valuemin="0" aria-valuemax="100">
+                          </div>
+
+                         </div>
+
+                           <!--  style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>-->
                         </div>
                         
                     </div>

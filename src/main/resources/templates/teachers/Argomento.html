@@ -740,9 +740,26 @@
                         <a style="font-size: 25px;" class="h2" th:href="@{'/lezione/' +${m.id}} "
                            th:text="${m.name}"></a>
                         <div class="mt-5">
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0"
-                                     aria-valuemax="100"></div>
+							
+              <!--            <div  th:each="u : ${students}" >
+							<div th:text="${m.id.toString()}+' '+${u.id.toString()}+' '+${progressMap[u.id.toString() + '-' + m.id.toString()]}"></div>
+                          
+                          <div class="progress">
+								
+						<!--		 <div class="progress-bar" role="progressbar"  aria-valuenow="50" aria-valuemin="0"
+                                     aria-valuemax="100"></div> -->
+                                     
+                <!--            <div class="progress-bar" role="progressbar"
+         th:style="'width: ' + (${progressMap[u.id.toString() + '-' + m.id.toString()] != null} ? ${progressMap[u.id.toString() + '-' + m.id.toString()].percentage} : 0) + '%'"
+         th:attr="aria-valuenow=${progressMap[u.id.toString() + '-' + m.id.toString()] != null ? progressMap[u.id.toString() + '-' + m.id.toString()].percentage : 0}"
+         aria-valuemin="0" aria-valuemax="100">
+    </div>-->
+
+          </div>                       
+        </div>
+    </div> 
+
+
                             </div>
 
                         </div>

@@ -1,5 +1,6 @@
 package it.cnr.istc.psts.wikitel.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,10 +8,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import aj.org.objectweb.asm.TypeReference;
 import it.cnr.istc.psts.wikitel.Repository.LessonsRepository;
+import it.cnr.istc.psts.wikitel.db.FileRuleEntity;
 import it.cnr.istc.psts.wikitel.db.LessonEntity;
 import it.cnr.istc.psts.wikitel.db.ModelEntity;
+import it.cnr.istc.psts.wikitel.db.RuleEntity;
+import it.cnr.istc.psts.wikitel.db.TextRuleEntity;
 import it.cnr.istc.psts.wikitel.db.UserEntity;
+import it.cnr.istc.psts.wikitel.db.WebRuleEntity;
 
 
 @Service
@@ -72,6 +82,8 @@ public class LessonService {
 		return this.lessonsrepository.findByTeachersonly(id);
 	}
 	
+	
+
 
 	
 }

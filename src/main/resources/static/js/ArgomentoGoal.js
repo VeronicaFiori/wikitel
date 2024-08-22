@@ -81,8 +81,16 @@ function drop(event) {
 function updateContainerOrder() {
     const containerOrder = Array.from(document.querySelectorAll(".goal_box")).map(elem => elem.id);
     console.log("Ordine attuale dei container:", containerOrder);
+    
+    
+    
     return containerOrder;
+    
+    
 }
+
+
+
 
 function restoreInitialState() {
     const container = document.getElementById('containerGoal');
