@@ -2,6 +2,9 @@ var max=0;
 var value=0;
 
 
+
+
+
 export function file_upload(){
 	var form = $("#formFileLg")[0].files[0];
 	var data = new FormData();
@@ -29,17 +32,25 @@ export function file_upload(){
 }
 }
 
+
 export function play() {
+	
 	
    $.ajax({
         type: "POST",
         contentType: "application/json",
         url: "/play",
-        data:  JSON.stringify({id: document.getElementById('lesson_id').getAttribute('value')}) ,
+        data:  JSON.stringify({
+			id: document.getElementById('lesson_id').getAttribute('value') ,
+		    name: document.getElementById('lesson_name').getAttribute('value')  // Assicurati di inviare anche il nome
+        }),
+			
        success: function(data) {
 			console.log("SUCCESS : ", data);
             document.getElementById('statuss').className="badge bg-success";
             document.getElementById('statuss').innerText="Running";
+           
+
         },
         error: function(e) {
             alert("Error!")
@@ -115,19 +126,42 @@ export function horizon(horizon){
 	max=horizon;
 }
 
-export function loading(v){
-	console.log("v: "+v)
-	value = parseFloat(((v*100)/max).toFixed(1)); 
-	if(v=0){value=0;}
-		console.log(value);
-		document.getElementById("progressbar").style.width= value +"%";
-		document.getElementById("progressbar").innerText=value+"%";
-}
+//export function loading(v){
+
+  // var progressBar = document.getElementById("progressbar");
+    
+    
+    // Aggiorna la larghezza della barra
+    //progressBar.style.width = 5 + "%";
+
+    // Aggiorna il valore di `aria-valuenow` per l'accessibilità
+  //  progressBar.setAttribute("aria-valuenow", 5);
+
+    // Aggiorna il testo visualizzato all'interno della progress bar
+    //progressBar.innerText = 5 + "%";
+           
+//	console.log("v: "+v)
+//	value = parseFloat(((v*100)/max).toFixed(1)); 
+//	if(v=0){value=0;}
+//		console.log(value);
+//		document.getElementById("progressbar").style.width= value +"%";
+//		document.getElementById("progressbar").innerText=value+"%";
+//}
+
+
+
+
+
+
+
+
+
 
 export function new_stimuli(src){
 	document.getElementById("textarea").style.display="none"
 	document.getElementById("iframe").style.display="block"
 	document.getElementById("iframe").setAttribute("src",src);
+	
 	
 }
 export function new_stimuli_icon(id){

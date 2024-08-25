@@ -1,8 +1,6 @@
 package it.cnr.istc.psts.wikitel.controller;
 
 
-import static it.cnr.istc.psts.wikitel.db.UserEntity.STUDENT_ROLE;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -10,10 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -38,17 +34,25 @@ import it.cnr.istc.pst.oratio.SolverException;
 import it.cnr.istc.psts.Websocket.Sending;
 import it.cnr.istc.psts.wikitel.MongoRepository.RuleMongoRepository;
 import it.cnr.istc.psts.wikitel.Repository.CredentialsRepository;
+import it.cnr.istc.psts.wikitel.Repository.FilesRepository;
 import it.cnr.istc.psts.wikitel.Repository.ModelRepository;
 import it.cnr.istc.psts.wikitel.Repository.UserRepository;
 import it.cnr.istc.psts.wikitel.Service.CredentialService;
 import it.cnr.istc.psts.wikitel.Service.LessonService;
 import it.cnr.istc.psts.wikitel.Service.ModelService;
+import it.cnr.istc.psts.wikitel.Service.ProgressService;
 import it.cnr.istc.psts.wikitel.Service.UserService;
 import it.cnr.istc.psts.wikitel.db.Credentials;
+import it.cnr.istc.psts.wikitel.db.FileRuleEntity;
+import it.cnr.istc.psts.wikitel.db.Files;
 import it.cnr.istc.psts.wikitel.db.LessonEntity;
 import it.cnr.istc.psts.wikitel.db.ModelEntity;
+import it.cnr.istc.psts.wikitel.db.Progress;
 import it.cnr.istc.psts.wikitel.db.RuleEntity;
+import it.cnr.istc.psts.wikitel.db.TextRuleEntity;
 import it.cnr.istc.psts.wikitel.db.UserEntity;
+import it.cnr.istc.psts.wikitel.db.WebRuleEntity;
+import it.cnr.istc.psts.wikitel.db.WikiRuleEntity;
 
 
 
@@ -59,6 +63,8 @@ public class pageController {
 	
 
 	
+	private static final Object STUDENT_ROLE = null;
+
 	@Autowired
 	private UserService userservice;
 	
@@ -86,8 +92,10 @@ public class pageController {
 	@Autowired
 	private CredentialsRepository credentialsRepository;
 
-	 
-	 
+	@Autowired
+	private FilesRepository filesRepository;
+	@Autowired
+	private ProgressService progressService;
 	 
 
 
@@ -140,10 +148,12 @@ public class pageController {
     	model.addAttribute("interests", interests.getInterests());
     	model.addAttribute("user",userentity);
     	model.addAttribute("Teachers",userservice.getTeacher(userentity.TEACHER_ROLE));
+
     	if( MainController.newUsers.contains(userentity.getId()) ) {
     		model.addAttribute("first",true);
     	}
     	MainController.newUsers.remove(userentity.getId());
+    	
     	if(credentials.isEnabled()) {
     	if (credentials.getRole().equals(UserEntity.STUDENT_ROLE)) {
     		HashMap<String,ArrayList<LessonEntity>> t = new HashMap<>();
@@ -154,9 +164,33 @@ public class pageController {
     				t.put(l.getTeacher().getFirst_name() + " " + l.getTeacher().getLast_name(), new ArrayList<>());
     				t.get(l.getTeacher().getFirst_name() + " " + l.getTeacher().getLast_name()).add(l);
     			}
+            	
+            	
+
     		}
     		System.out.println(t);
     		model.addAttribute("lessons", t);
+    		
+    		/*per la progressbar**/
+    		Map<String, Progress> progressMap = new HashMap<>();
+
+    		for (String chiave : t.keySet()) {
+    		    for (LessonEntity lezione : t.get(chiave)) {
+    		        String lezioneIdStr = lezione.getId().toString();
+    		        model.addAttribute("lezioneIdStr", lezioneIdStr);
+    		        
+    		        String userIdStr= userentity.getId().toString();
+    		        model.addAttribute("userIdStr", userIdStr);
+    		        Progress progress = this.progressService.getProgress(userIdStr, lezioneIdStr);
+    		        progressMap.put(lezioneIdStr, progress);
+    		    }
+    		}
+
+    		model.addAttribute("progressMap", progressMap);
+    		
+    		
+    		
+        	
             return "admin/hello";   //non deve essere admin 
         }
     	else  if (credentials.getRole().equals(credentials.ADMIN_ROLE)) {
@@ -224,7 +258,8 @@ public class pageController {
 		return interests;
 		
 	}
-	
+
+		
 	@GetMapping(value = "/lezione/{id}")
 	public String det_ordine(@PathVariable("id")Long id , Model model) throws JsonProcessingException {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -247,6 +282,7 @@ public class pageController {
 		model.addAttribute("roles", credentials.getRole());
 		model.addAttribute("files",lezione.getFiles());
 		model.addAttribute("lezione",lezione);
+		model.addAttribute("userId", userentity.getId());
 		DateFormat df = new SimpleDateFormat("yy"); // Just the year, with 2 digits
 		String formattedDate = df.format(Calendar.getInstance().getTime());
 		DateFormat df2 = new SimpleDateFormat("yy"); // Just the year, with 2 digits
@@ -254,41 +290,67 @@ public class pageController {
 		model.addAttribute("anno",formattedDate + "/" + (((Calendar.getInstance().get(Calendar.YEAR)+1))%100));
 		model.addAttribute("students",lezione.getFollowed_by());
 		String n = String.valueOf(id) + String.valueOf(userentity.getId());
-
-		Set<RuleEntity> goals = new HashSet<>();
-		for( RuleEntity r : lezione.getGoals()){
-			goals.add(r);
-			for (RuleEntity pre :r.getPreconditions()){
-				goals.add(pre);
-			}
-		}
+	
+		/**/
+		LessonManager lessonManager = new LessonManager(lezione, send, modelservice, userservice, null);
+		List<RuleEntity> goals = lessonManager.getArgomentiPerStudenti();
 		model.addAttribute("goalsl",goals);
-		if(credentials.getRole().equals(STUDENT_ROLE)) { 
-			Json_reader interests = json("/json/user_model.json",true);
-//	        ArrayList<Interests> interestsSet = interests.getInterests();
-//
-//		    Iterator<RuleEntity> iterator = goals.iterator();
-//		    while (iterator.hasNext()) {
-//		        RuleEntity goal = iterator.next();
-//		        boolean matchesInterest = false;
-//		        for (String topic : goal.getTopics()) {
-//		            if (interestsSet.contains(topic)) {
-//		                matchesInterest = true;
-//		                break;
-//		            }
-//		        }
-//		        if (!matchesInterest) {
-//		            iterator.remove();
-//		        }
-//		    }
-	        
+		
+		List<String> wiki = new ArrayList<>();
+		List<String> web = new ArrayList<>();
+		List<String> text = new ArrayList<>();
+		List<String> file = new ArrayList<>();
 
-			System.out.println("PROVA : " + MainController.LESSONS);
-		model.addAttribute("messages",MainController.LESSONS.get(n).getStimuli(userentity.getId()));
+		for(RuleEntity g : goals) {
+		    if (g instanceof WebRuleEntity) {
+		      //  web.add(((WebRuleEntity) g).getUrl());
+		    	web.add(((WebRuleEntity) g).getName());
+		        model.addAttribute("web",web);
+
+		    } else if (g instanceof TextRuleEntity) {
+		      //  text.add(((TextRuleEntity) g).getText());
+		    	text.add(((TextRuleEntity) g).getName());
+		        model.addAttribute("text",text);
+
+		    } else if (g instanceof FileRuleEntity) {
+		    //    file.add(((FileRuleEntity) g).getSrc());
+		    	file.add(((FileRuleEntity) g).getName());
+		        model.addAttribute("file",file);
+		        
+		    } else if (g instanceof WikiRuleEntity) {
+		        wiki.add(g.getName());
+
+		        model.addAttribute("wiki",wiki);
+		    }
 
 		}
-		//model.addAttribute("goalsl",goals);
+		List<Files> filepdf= this.filesRepository.findAll();
+        model.addAttribute("filepdf",filepdf);
+        
+		if(credentials.getRole().equals(STUDENT_ROLE)) { 
+			Json_reader interests = json("/json/user_model.json",true);        
+			System.out.println("PROVA : " + MainController.LESSONS);
+		    model.addAttribute("messages",MainController.LESSONS.get(n).getStimuli(userentity.getId()));
+
+		}
+				
 		
+		Map<String, Progress> progressMap = new HashMap<>();
+
+		String lezioneIdStr = lezione.getId().toString();
+		model.addAttribute("lezioneIdStr", lezioneIdStr);
+
+		for(UserEntity userId: lezione.getFollowed_by()) {
+			String userIdStr = userId.getId().toString();
+			model.addAttribute("userIdStr", userIdStr);
+			Progress progress = this.progressService.getProgress(userIdStr, lezioneIdStr);
+			progressMap.put(userIdStr, progress);
+
+
+			model.addAttribute("progressMap", progressMap);
+		}
+
+		    
 		return "teachers/lezione";
 	}
 	
@@ -310,7 +372,7 @@ public class pageController {
 		model.addAttribute("lesson",this.lessonservice.getlessonbymodel(this.modelservice.getModel(id)));
 		model.addAttribute("user",userentity);
 		
-		
+
 		return "teachers/Argomento";
 	}
 	

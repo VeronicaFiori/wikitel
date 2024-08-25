@@ -135,7 +135,7 @@ function setup_ws(msg) {
             console.log(msg);
             console.log(localStorage.getItem("horizon"));
             	lesson.horizon(localStorage.getItem("horizon"));
-               lesson.loading(c_msg.current_time.num);
+         //      lesson.loading(c_msg.current_time.num);
                 break;
             case 'StartingAtoms':
                 console.log("StartingAtoms")

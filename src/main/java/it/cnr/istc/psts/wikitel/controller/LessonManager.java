@@ -1,16 +1,36 @@
 package it.cnr.istc.psts.wikitel.controller;
 
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ScheduledFuture;
+import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageType;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import it.cnr.istc.pst.oratio.Atom;
 import it.cnr.istc.pst.oratio.Bound;
 import it.cnr.istc.pst.oratio.GraphListener;
 import it.cnr.istc.pst.oratio.Rational;
 import it.cnr.istc.pst.oratio.timelines.ExecutorListener;
-import it.cnr.psts.wikitel.API.Timeline;
 import it.cnr.istc.pst.oratio.utils.Flaw;
 import it.cnr.istc.pst.oratio.utils.Resolver;
 import it.cnr.istc.psts.Websocket.Sending;
@@ -18,21 +38,18 @@ import it.cnr.istc.psts.wikitel.Service.ModelService;
 import it.cnr.istc.psts.wikitel.Service.RuleService;
 import it.cnr.istc.psts.wikitel.Service.Starter;
 import it.cnr.istc.psts.wikitel.Service.UserService;
-import it.cnr.istc.psts.wikitel.db.*;
+import it.cnr.istc.psts.wikitel.db.FileRuleEntity;
+import it.cnr.istc.psts.wikitel.db.LessonEntity;
+import it.cnr.istc.psts.wikitel.db.RuleEntity;
+import it.cnr.istc.psts.wikitel.db.TextRuleEntity;
+import it.cnr.istc.psts.wikitel.db.UserEntity;
+import it.cnr.istc.psts.wikitel.db.WebRuleEntity;
+import it.cnr.istc.psts.wikitel.db.WikiRuleEntity;
 import it.cnr.psts.wikitel.API.Lesson.LessonState;
 import it.cnr.psts.wikitel.API.Message;
 import it.cnr.psts.wikitel.API.Message.Stimulus;
+import it.cnr.psts.wikitel.API.Timeline;
 import it.cnr.psts.wikitel.API.TimelineValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessageType;
-
-import java.text.Normalizer;
-import java.util.*;
-import java.util.concurrent.ScheduledFuture;
-import java.util.stream.Stream;
 
 
 
@@ -66,7 +83,8 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 	private final Map<Long, Resolver> resolvers = new HashMap<>();
 	private Resolver current_resolver = null;
 	private UserEntity student;
-	private Timeline timeline;
+	private Timeline timeline = new Timeline(new ArrayList<>()); 
+
 
 
 
@@ -84,10 +102,11 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 			stimuli.put(student.getId(), new ArrayList<>());
 			this.student = student;
 		}
+
 	}
 	
 	
-	private List<RuleEntity> getArgomentiPerStudenti() throws JsonMappingException, JsonProcessingException  {
+	public List<RuleEntity> getArgomentiPerStudenti() throws JsonMappingException, JsonProcessingException  {
 		final List<RuleEntity> argomenti= new ArrayList<>();
 		
 		ObjectMapper mapper = new ObjectMapper();
@@ -107,6 +126,9 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 		return argomenti;
 	}
 
+	
+	
+
 
 	public void Solve() throws JsonMappingException, JsonProcessingException {
 		final StringBuilder sb = new StringBuilder();
@@ -122,85 +144,19 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 	}
 	
 
-/**********PROVA**********/
-//	private void play( List<RuleEntity> argomentiPerStudenti) {
-//
-//		int i= 0;
-//		
-//	    for(RuleEntity arg : argomentiPerStudenti){
-//	      if(arg!=null) {
-//		   for(i=0; i<=arg.getLength();i++) {
-//			  play(argomentiPerStudenti);			
-//			 }
-//            
-//		   }	     
-//	      }  		   
-//	    }
+
 	
-	private int currentIndex = 0; // Indice dell'argomento corrente
-	private int counter = 0; // Contatore per il progresso della lezione
+	
 
-	public void play() throws JsonMappingException, JsonProcessingException {
-//		List<RuleEntity> argomentiPerStudenti = getArgomentiPerStudenti();
-//
-//	    if (argomentiPerStudenti == null || argomentiPerStudenti.isEmpty()) {
-//	        // Gestisci il caso in cui non ci siano argomenti
-//	        return;
-//	    }
-//	    
-//	    RuleEntity currentArgomento = argomentiPerStudenti.get(currentIndex);
-//
-//	    for(RuleEntity arg : argomentiPerStudenti){
-//	    if (arg != null) {
-//	        Long length = arg.getLength();
-//	        
-//	        
-//	        
-//			// Azione di play
-//	       // if (lesson.play) {
-//	            counter++;
-//	            setState(LessonState.Running);
-//	                       
-//	            if (counter >= length) {
-//	                currentIndex++;
-//	                
-//	                counter = 0; 
-//	                if (currentIndex >= argomentiPerStudenti.size()) {
-//	                    return;
-//	                }
-//	            }
-//	      // } else if ("next".equals(e.getActionCommand())) {
-//
-//	        	if (counter < length / 2) {
-//	                int response = JOptionPane.showConfirmDialog(null, 
-//	                    "Sei sicuro di voler andare avanti? Non hai completato metà della lezione.",
-//	                    "Conferma",
-//	                    JOptionPane.YES_NO_OPTION);
-//	                
-//	                if (response == JOptionPane.YES_OPTION) {
-//	                    currentIndex++;
-//	                    counter = 0; // Resetta il contatore
-//	                    if (currentIndex >= argomentiPerStudenti.size()) {
-//	                      
-//	                        return;
-//	                    }
-//	                }
-//	            } else {
-//	                currentIndex++;
-//	                counter = 0; 
-//	                if (currentIndex >= argomentiPerStudenti.size()) {
-//	                    return;
-//	                }
-//	            }
-//	        }
-//	   } else {
-//	        // Gestisci il caso in cui l'argomento corrente è null
-//	        System.out.println("Argomento corrente non valido.");
-//	    }
-//	  }
-	}
+	public void play() {
+		scheduled_feature.cancel(false);
+		setState(LessonState.Running);
+    }
+	
 
+	
 
+	
 
 
 
@@ -253,12 +209,9 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 	
 	
 
-	public Timeline geTimeline(){
-		return this.timeline;
-	}
 
 	public void setTimeline(List<RuleEntity> argomentiPerStudenti){
-		this.timeline = new Timeline(new ArrayList<>());
+	//	this.timeline = new Timeline(new ArrayList<>());
 		float horizon = 0;
 		float currentTime = 0;
 		for(RuleEntity arg : argomentiPerStudenti){
@@ -272,9 +225,13 @@ public class LessonManager implements GraphListener, ExecutorListener  {
 			currentTime += arg.getLength();
 		}
 		this.timeline.setHorizon(horizon);
+			
 	}
 	
-
+	public Timeline geTimeline(){
+		return this.timeline;
+	}
+	
 
 	public LessonState getState() {
 		return state;

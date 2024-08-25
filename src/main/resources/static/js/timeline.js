@@ -54,8 +54,7 @@ array.forEach(function(s) {
      listItemContent += '<button style="background:none;border:none;" <strong>' + s.arg + '</strong></button>';
 
     listItemContent += '</span></li>';
-
-
+    
     document.getElementById("lista_obiettivi").innerHTML += listItemContent;
 ;
 rows.push(['rule', s.arg , new Date(0,0,0,0,0,s.from),new Date(0,0,0,0,0,s.to)  ])

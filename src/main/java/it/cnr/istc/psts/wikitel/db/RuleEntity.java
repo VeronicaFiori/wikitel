@@ -1,12 +1,10 @@
 package it.cnr.istc.psts.wikitel.db;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,19 +13,17 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import it.cnr.istc.psts.wikitel.Mongodb.RuleMongo;
-import it.cnr.istc.psts.wikitel.Mongodb.SuggestionM;
 import it.cnr.istc.psts.wikitel.Mongodb.SuggestionMongo;
-import lombok.Data;
+
 
 @Entity
 
@@ -142,6 +138,7 @@ public class RuleEntity {
 
 	
 
+	   
 	   
 
 	    
