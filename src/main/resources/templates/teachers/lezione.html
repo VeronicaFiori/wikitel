@@ -397,7 +397,230 @@ function generateQuiz(){
     });
 }
 </script>
+<script type="text/javascript" th:inline="javascript" >
 
+    //variabili
+    var goalsl = /*[[${goalsl}]]*/ [];    //lista degli argomenti
+    var currentIndex = 0;
+    var filepdf = /*[[${filepdf}]]*/ [];
+    var percentage = 0;
+    var currentLength = 0;
+    var lezioneId = /*[[${lezione.id}]]*/ '';
+    var userId = /*[[${userId}]]*/ '';
+    var totLength = goalsl.reduce((acc, goal) => acc + goal.length, 0);
+    var startTime; // timer per la visualizzazione della lezione
+
+
+    /*Funzione per il salvataggio per la progressbar*/
+    async function saveProgress(userId, lezioneId, currentIndex, currentLength, percentage) {
+        console.log("Salvataggio dei dati: ", {
+            userId: userId,
+            lezioneId: lezioneId,
+            currentIndex: currentIndex,
+            currentLength: currentLength,
+            percentage: percentage
+        });
+
+        try {
+            const response = await fetch('/api/progress/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    lezioneId: lezioneId,
+                    currentIndex: currentIndex,
+                    currentLength: currentLength,
+                    percentage: percentage.toFixed(2)
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Progress saved:', data);
+            } else {
+                console.error('Failed to save progress. Status:', response.status);
+            }
+
+        } catch (error) {
+            console.error('Error saving progress:', error);
+        }
+    }
+
+    /*Get dei dati salvati nel db*/
+    async function getProgress(userId, lezioneId) {
+        try {
+            const response = await fetch(`/api/progress/get?userId=${userId}&lezioneId=${lezioneId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Progress retrieved:', data);
+
+                // Verifica che i dati siano corretti e aggiorna la progress bar
+                if (data && data.percentage != null) {
+                    if(data.percentage!=0){
+                        updateProgressBar(data.percentage);
+                        currentIndex=(data.currentIndex)+1;
+                        currentLength=data.currentLength;
+                        loadCurrentGoal();
+                    }
+                    else{
+                        updateProgressBar(data.percentage);
+                        currentIndex=(data.currentIndex);
+                        currentLength=data.currentLength;
+                        loadCurrentGoal();
+
+                    }
+
+                } else {
+                    // Se non ci sono dati salvati per il progresso inizio dal primo argomento
+                    currentIndex = 0;
+                    updateProgressBar(0);
+                    loadCurrentGoal();
+                }
+                return data;
+            } else {
+                console.error('Failed to retrieve progress. Status:', response.status);
+                return null;
+            }
+        } catch (error) {
+            console.error('Error retrieving progress:', error);
+            return null;
+        }
+    }
+
+
+    window.onload = function() {
+        getProgress(userId, lezioneId); // Carica lo stato dal server
+
+    };
+
+
+
+    /*Load del primo argomento al click di "Visualizza lezione"*/
+    function loadCurrentGoal() {
+        if (currentIndex < goalsl.length) {
+
+            /*per ordinare*/
+            var timelineItems = document.querySelectorAll('#lista_obiettivi li');
+            var timelineNames = Array.from(timelineItems).map(item => item.textContent.trim());
+
+            console.log(timelineItems);
+            console.log(timelineNames);
+
+            function sortGoalsByList(goalsl, timelineNames) {
+                return goalsl.sort((a, b) => {
+                    return timelineNames.indexOf(a.name) - timelineNames.indexOf(b.name);
+                });
+            }
+
+            // Ordinamento di goals
+            goalsl = sortGoalsByList(goalsl, timelineNames);
+            console.log(goalsl);
+
+            var currentGoal = goalsl[currentIndex];
+            var a = currentGoal.name;
+            var wiki = /*[[${wiki}]]*/ 'c';
+            var web = /*[[${web}]]*/ 'c';
+            var text = /*[[${text}]]*/ 'c';
+            var file = /*[[${file}]]*/ 'c';
+
+
+            if (web && web.length > 0 && web.includes(a)) { //web
+                document.getElementById("iframe").src = currentGoal.url;
+            } else if (file && file.length > 0 && file.includes(a)) {  //file
+                var srcFile = currentGoal.src;
+                var srcNameFile = srcFile.split('\\').pop().split('/').pop();
+                var index = 0;
+                while (index < goalsl.length) {
+                    var namepdf = filepdf[index].name;
+                    if (namepdf === srcNameFile) {
+                        var fileUrl = '/RuleEntity/' + namepdf;
+                        document.getElementById("iframe").src = fileUrl;
+                        break;
+                    }
+                    index++;
+                }
+            } else if (text && text.length > 0 && text.includes(a)) {  //text
+                var textContent = currentGoal.text;
+                document.getElementById("iframe").src = 'data:text/plain;charset=utf-8,' + encodeURIComponent(textContent);
+            } else if (wiki && wiki.length > 0 && wiki.includes(a)) { //wiki
+                document.getElementById("iframe").src = "https://it.wikipedia.org/wiki/" + a;
+            }
+
+            startTime = new Date().getTime();
+        }
+    }
+
+    function nextLesson() {
+        if (currentIndex < goalsl.length) {
+            var elapsedTime = (new Date().getTime() - startTime) / 1000;
+            var requiredTime = goalsl[currentIndex].length / 2;
+
+            if (elapsedTime < requiredTime) {
+                var proceed = confirm("Sei sicuro che vuoi già andare avanti?");
+                if (!proceed) {
+                    return;
+                }
+            }
+
+            currentLength += goalsl[currentIndex].length;
+            percentage = (currentLength / totLength) * 100;
+            console.log("percentuale",percentage);
+
+            saveProgress(userId, lezioneId, currentIndex, currentLength, percentage);
+            updateProgressBar(percentage);
+            currentIndex++;
+
+            if (currentIndex < goalsl.length) {
+                loadCurrentGoal();
+
+            }
+        }
+
+        if (currentIndex >= goalsl.length) {
+            var nextButton = document.getElementById('nextButton');
+            nextButton.innerText = 'Close';
+            nextButton.setAttribute('data-bs-dismiss', 'modal');
+            nextButton.style.display = 'none';
+
+            var lessonEndModal = new bootstrap.Modal(document.getElementById('lessonEndModal'));
+            lessonEndModal.show();
+
+            document.getElementById('lessonEndModal').addEventListener('hidden.bs.modal', function () {
+                window.location.href = '/lezione/' + lezioneId;
+            });
+        }
+
+
+    }
+
+    function resetLesson() {
+        currentIndex = 0;
+        currentLength = 0;
+        percentage = 0;
+
+        saveProgress(userId, lezioneId, currentIndex, currentLength, percentage)
+
+        loadCurrentGoal();
+        updateProgressBar(0);
+        window.location.href = '/lezione/' + lezioneId;
+    }
+
+    function updateProgressBar(percentage) {
+        var progressBar = document.getElementById("progressbar");
+        progressBar.style.width = percentage + "%";
+        progressBar.setAttribute("aria-valuenow", percentage);
+        progressBar.innerText = percentage.toFixed(2) + "%";
+    }
+
+</script>
 
 
 
@@ -544,7 +767,7 @@ function generateQuiz(){
    <div id="timeline" style="height: 150px;"></div>
   
   </div>
-         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quizModal">
+         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quizModal">Quiz</button>
 
   <button type="button" class="btn btn-primary" th:if="${roles}=='STUDENT'" data-bs-toggle="modal" data-bs-target="#stimulo">
  <!-- onclick="wikilink(name)"-->
