@@ -30,7 +30,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import it.cnr.istc.pst.oratio.SolverException;
+
 import it.cnr.istc.psts.Websocket.Sending;
 import it.cnr.istc.psts.wikitel.MongoRepository.RuleMongoRepository;
 import it.cnr.istc.psts.wikitel.Repository.CredentialsRepository;
@@ -101,7 +101,7 @@ public class pageController {
 
 
 	@RequestMapping(value = {"/","/index"}, method = RequestMethod.GET)
-	public String index(Model model) throws NoSuchFieldException, SolverException, IOException, InterruptedException {
+	public String index(Model model) throws NoSuchFieldException, IOException, InterruptedException {
 		RestTemplate restTemplate = new RestTemplate();
 		//Prova prova = restTemplate.getForObject("http://192.168.1.79:5015/wiki?page=Palombaro_lungo", Prova.class);
 		//System.out.println(prova.getLength());

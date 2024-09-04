@@ -162,7 +162,6 @@ public class MainController {
           LessonManager manager = MainController.LESSONS.get(n);
           send.notify(Starter.mapper.writeValueAsString(new Message.User(u.getId())), session.getSession());
           send.notify(Starter.mapper.writeValueAsString(new Message.Timeline(manager.geTimeline())), session.getSession());
-          send.notify(Starter.mapper.writeValueAsString(new LessonManager.Tick(session.getLesson_id(), manager.getCurrentTime())), session.getSession());
         }
       } else {
 
@@ -170,7 +169,6 @@ public class MainController {
         LessonManager manager = MainController.LESSONS.get(n);
 
         send.notify(Starter.mapper.writeValueAsString(new Message.Timeline(manager.geTimeline())), session.getSession());
-        send.notify(Starter.mapper.writeValueAsString(new LessonManager.Tick(session.getLesson_id(), manager.getCurrentTime())), session.getSession());
 
         if (manager.st != null) {
           send.notify(Starter.mapper.writeValueAsString(MainController.LESSONS.get(n).st), UserController.ONLINE.get(session.getUser_id()));
@@ -1109,9 +1107,10 @@ public class MainController {
     List<QuizQuestion>  quizQuestionList = new ArrayList<>();
     RuleMongo ruleMongo = this.modelservice.getRuleMongoByTitle(rule);
     String basePrompt = "Create 10 high school - italian level quiz based on the provided text.\n"
-            + "You must strictly add here to the following format without any errors:\n"
+            + "You must strictly add here to the following json format without any errors:\n"
             +"[\n"
             + "{\n"
+            + "    \"id\": \"*[ Insert id the index of question]*\",\n"
             + "    \"question\": \"*[ Insert the question ]*\",\n"
             + "    \"options\": {\n"
             + "        \"a\": \"*[ Option A ]*\",\n"
@@ -1123,7 +1122,7 @@ public class MainController {
             "where the information for this question can be found.]*\",\n"
             + "    \"correct_answer\": \"*[Insert the letter corresponding to the correct answer, for example: 'c)']*\"\n"
             + "},\n"
-            + "// ... more questions ..."
+            + "// ... more questions ...\n"
             + "]\n"
             + "Please note that you are allowed to modify only the parts within\n"
             + "brackets (*[...]*) in the format provided.\n"
@@ -1133,23 +1132,24 @@ public class MainController {
 
     String paragraph = ruleMongo.getPlain_text();
     boolean validResult = true;
-    while (validResult) {
-      LOG.info("START----------GENERATE QUIZ------------------");
-      try {
-        LOG.info("START----------chatBotRest------------------");
-        ObjectNode jsonObject = chatBotRest(basePrompt, paragraph);
-        LOG.info("FINISH----------chatBotRest------------------");
-        LOG.info("START----------Formatting question------------------");
-        quizQuestionList = getQuestionAnswer(jsonObject.get("choices").get(0).toString());
-        LOG.info("FINISH----------Formatting question------------------");
-        validResult = false;
-      } catch (Exception e) {
-        LOG.error("------------ERROR RETRY JSON PARSING------------");
-      }
-    }
+    quizQuestionList =this.quizQuestionService.getQuizQuestionsByRule(Long.valueOf(33));
+//    while (validResult) {
+//      LOG.info("START----------GENERATE QUIZ------------------");
+//      try {
+//        LOG.info("START----------chatBotRest------------------");
+//        ObjectNode jsonObject = chatBotRest(basePrompt, paragraph);
+//        LOG.info("FINISH----------chatBotRest------------------");
+//        LOG.info("START----------Formatting question------------------");
+//        quizQuestionList = getQuestionAnswer(jsonObject.get("choices").get(0).toString());
+//        LOG.info("FINISH----------Formatting question------------------");
+//        validResult = false;
+//      } catch (Exception e) {
+//        LOG.error("------------ERROR RETRY JSON PARSING------------");
+//      }
+//    }
     LOG.info("FINISH----------GENERATE QUIZ------------------");
 
-    return quizQuestionList;
+    return createQuizId(quizQuestionList, "33");
   }
 
 
@@ -1159,7 +1159,7 @@ public class MainController {
     List<QuizQuestion> questionsanswer = new ArrayList<QuizQuestion>();
     RuleMongo ruleMongo = this.modelservice.getRuleMongoByTitle(ruleName);
     String basePrompt = "Create 10 high school - italian level quiz based on the provided text.\n"
-            + "You must strictly add here to the following format without any errors:\n"
+            + "You must strictly add here to the json following format without any errors:\n"
             +"[\n"
             + "{\n"
             + "    \"question\": \"*[ Insert the question ]*\",\n"
@@ -1173,7 +1173,7 @@ public class MainController {
             "where the information for this question can be found.]*\",\n"
             + "    \"correct_answer\": \"*[Insert the letter corresponding to the correct answer, for example: 'c)']*\"\n"
             + "},\n"
-            + "// ... more questions ..."
+            + "// ... more questions ...\n"
             + "]\n"
             + "Please note that you are allowed to modify only the parts within\n"
             + "brackets (*[...]*) in the format provided.\n"
@@ -1195,11 +1195,12 @@ public class MainController {
         validResult = false;
       } catch (Exception e) {
         LOG.error("------------ERROR RETRY JSON PARSING------------");
+        LOG.error("ERROR MESSAGE",e);
       }
     }
     LOG.info("FINISH----------GENERATE QUIZ------------------");
     quizQuestionList.setRuleId(ruleId);
-    quizQuestionList.setQuizQuestions(questionsanswer);
+    quizQuestionList.setQuizQuestions(createQuizId(questionsanswer, String.valueOf(ruleId)));
     this.quizQuestionService.save(quizQuestionList);
     LOG.info("---------------SAVED NEW QUIZZ FOR RULE " + ruleId +" ---------------");
 
@@ -1235,20 +1236,25 @@ public class MainController {
     return questions;
   }
 
+  public List<QuizQuestion> createQuizId(List<QuizQuestion> questions, String ruleId){
+    List<QuizQuestion> newQuestions = new ArrayList<>();
+    for(QuizQuestion question : questions){
+      String id = question.getId();
+      question.setId(ruleId + "|" +id);
+      newQuestions.add(question);
+    }
+    return newQuestions;
+  }
+
   public static String extractJSON(String text) {
     StringBuilder jsonBlocks = new StringBuilder();
-    int openBraces = 0;
-    boolean insideJson = false;
-    boolean parentesiQuadra = true;
     StringBuilder currentJsonBlock = new StringBuilder();
+    Stack<Character> stack = new Stack<>();
+    boolean insideJson = false;
 
     for (char c : text.toCharArray()) {
-      if (c == '[' && parentesiQuadra) {
-        openBraces++;
-        insideJson = true;
-      }
-      if (c == '{') {
-        openBraces++;
+      if (c == '{' || c == '[') {
+        stack.push(c);
         insideJson = true;
       }
 
@@ -1256,27 +1262,45 @@ public class MainController {
         currentJsonBlock.append(c);
       }
 
-      if (c == '}' || (c == ']' && parentesiQuadra)) {
-        openBraces--;
-        if (openBraces == 0 && insideJson) {
+      if (c == '}' || c == ']') {
+        if (!stack.isEmpty() && ((c == '}' && stack.peek() == '{') || (c == ']' && stack.peek() == '['))) {
+          stack.pop();
+        }
+
+        if (stack.isEmpty() && insideJson) {
           insideJson = false;
-          if (parentesiQuadra && c!= ']')
-            jsonBlocks.append(currentJsonBlock.toString().trim()).append(",\n");
-          else
-            jsonBlocks.append(currentJsonBlock.toString().trim()).append("\n");
-          currentJsonBlock.setLength(0);  // Reset the StringBuilder for the next JSON block
+          jsonBlocks.append(currentJsonBlock.toString().trim()).append("\n");
+          currentJsonBlock.setLength(0); // Reset the StringBuilder for the next JSON block
         }
       }
-
-      if (c == ']') {
-        parentesiQuadra = false;
-      }
-
+    }
+    if (insideJson) {
+      String completedJson = fixMissingBrackets(currentJsonBlock.toString().trim());
+      jsonBlocks.append(completedJson);
     }
 
     return jsonBlocks.toString().trim();
   }
 
+  private static String fixMissingBrackets(String jsonBlock) {
+    int openBraces = 0, closeBraces = 0;
+    int openBrackets = 0, closeBrackets = 0;
+
+    // Conta parentesi aperte e chiuse
+    for (char c : jsonBlock.toCharArray()) {
+      if (c == '[') openBrackets++;
+      if (c == ']') closeBrackets++;
+    }
+
+    // Aggiunge le parentesi mancanti
+    StringBuilder correctedJson = new StringBuilder(jsonBlock);
+    while (closeBrackets < openBrackets) {
+      correctedJson.append(']');
+      closeBrackets++;
+    }
+
+    return correctedJson.toString();
+  }
   
 //  @Autowired
 //  private CredentialService credentialService;
@@ -1305,7 +1329,10 @@ public class MainController {
 //      return "redirect:/userDetails/" + userId;
 //  }
   
-  
+//  @PostMapping("/chekQuiz")
+//  public List<QuizQuestion> checkQuiz(){
+//
+//  }
   
   
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 @Data
 public class QuizQuestion {
 
+    private String id;
     private String question;
     private Map<String, String> options;
     @JsonProperty("correct_answer")

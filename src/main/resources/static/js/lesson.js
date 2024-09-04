@@ -1,8 +1,104 @@
 var max=0;
 var value=0;
+let currentQuestionIndex = 0;
+function showQuestion(index) {
+    const questionCards = document.querySelectorAll('.question-card');
+    questionCards.forEach((card, i) => {
+        card.classList.toggle('active', i === index);
+    });
+
+    updateProgress(index);
+
+    document.getElementById('prev-btn').disabled = index === 0;
+    if(index === (questionCards.length - 1)){
+        document.getElementById('next-btn').innerText = "Submit"
+        document.getElementById('next-btn').onclick = checkQuiz
+    }else{
+        document.getElementById('next-btn').innerText = "Avanti"
+        document.getElementById('next-btn').removeAttribute("onclick")
+
+    }
+}
+function getAllSelectedAnswers() {
+    // Seleziona tutti i gruppi di radio buttons
+    const radioGroups = document.querySelectorAll('.question-card');
+
+    // Array per memorizzare le risposte selezionate
+    const selectedAnswers = [];
+
+    // Itera su ogni gruppo di domande
+    radioGroups.forEach((group, index) => {
+        // Cerca l'opzione selezionata in ogni gruppo
+        const selectedOption = group.querySelector('input[type="radio"]:checked');
+
+        // Se c'è un'opzione selezionata, ottiene il valore
+        if (selectedOption) {
+            selectedAnswers.push({
+                question: selectedOption.name,
+                value: selectedOption.value
+            });
+        } else {
+            // Se nessuna opzione è selezionata, salva come non risposta
+            selectedAnswers.push({
+                question: group.id,
+                value: null
+            });
+        }
+    });
+
+    return selectedAnswers;
+}
+
+function checkQuiz(){
+    document.getElementById("QuizLoaderWrapper").style.display = "none";
+    document.getElementById("loaderBackground").style.display = "grid"
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: "/chekQuiz",
+        data:  JSON.stringify(getAllSelectedAnswers()),
+
+        success: function(data) {
+            console.log("SUCCESS : ", data);
+            document.getElementById('statuss').className="badge bg-success";
+            document.getElementById('statuss').innerText="Running";
 
 
+        },
+        error: function(e) {
+            alert("Error!")
+            console.log("ERROR: ", e);
+        }
+    });
+}
+function updateProgress(currentStep) {
+    const steps = document.querySelectorAll('.stepper-item');
 
+    steps.forEach((step, index) => {
+        step.classList.toggle('active', index === currentStep);
+        step.classList.toggle('completed', document.querySelector(`input[name="${step.id}"]:checked`));
+
+
+    });
+
+}
+
+// Event Listener per il pulsante "Indietro"
+document.getElementById('prev-btn').addEventListener('click', () => {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion(currentQuestionIndex);
+    }
+});
+
+// Event Listener per il pulsante "Avanti"
+document.getElementById('next-btn').addEventListener('click', () => {
+    const questionCards = document.querySelectorAll('.question-card');
+    if (currentQuestionIndex < questionCards.length - 1) {
+        currentQuestionIndex++;
+        showQuestion(currentQuestionIndex);
+    }
+});
 
 
 export function file_upload(){

@@ -278,56 +278,218 @@ textarea {
 
 }
 #quiz-container {
-    max-width: 600px;
-    margin: 0 auto;
+    max-width: 900px;
+    width: 100%;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: flex;
 }
 
 .question-card {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    padding: 15px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+
 }
 
+.question-card.active {
+    display: flex;
+}
 .question-card h2 {
-    font-size: 18px;
-    margin-bottom: 15px;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #333;
 }
 
 .options-list {
-    list-style-type: none;
+    list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 .options-list li {
-    margin-bottom: 10px;
+    margin: 0.5rem 0;
+    font-size: 1rem;
 }
 
-.options-list li label.selected {
-    background-color: #e6e6e6;
-}
-.options-list li label {
-    padding: 10px;
+.options-list label {
     display: block;
+    padding: 10px 15px;
     border: 1px solid #ddd;
-    border-radius: 3px;
-    background-color: #f9f9f9;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-.options-list li label:hover {
-    background-color: #e6e6e6;
+.options-list input[type="radio"] {
+    display: none;
 }
 
-.options-list li.correct label {
-    background-color: #d4edda;
-    border-color: #c3e6cb;
+.options-list label:hover {
+    background-color: #f0f0f0;
+}
+
+.options-list input[type="radio"]:checked + label {
+    background-color: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+    margin-top:10px;}
+
+.btn {
+    background: linear-gradient(135deg, #007bff, #6610f2);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #6610f2, #007bff);
+}
+
+.btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#submit-btn {
+    display: none;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.stepper-wrapper {
+    font-family: Arial;
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.stepper-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+
+    @media (max-width: 768px) {
+        font-size: 12px;
+    }
+}
+
+.stepper-item::before {
+    position: absolute;
+    content: "";
+    border-bottom: 2px solid #ccc;
+    width: 100%;
+    top: 20px;
+    left: -50%;
+    z-index: 2;
+}
+
+.stepper-item::after {
+    position: absolute;
+    content: "";
+    border-bottom: 2px solid #ccc;
+    width: 100%;
+    top: 20px;
+    left: 50%;
+    z-index: 2;
+}
+
+.stepper-item .step-counter {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ccc;
+    margin-bottom: 6px;
+}
+
+.stepper-item.active {
+    font-weight: bold;
+}
+
+.stepper-item.completed .step-counter {
+    background-color: #007bff;
+}
+
+.stepper-item.completed::after {
+    position: absolute;
+    content: "";
+    border-bottom: 2px solid #007bff;
+    width: 100%;
+    top: 20px;
+    left: 50%;
+    z-index: 3;
+}
+
+.stepper-item:first-child::before {
+    content: none;
+}
+.stepper-item:last-child::after {
+    content: none;
+}
+
+
+/* Step Completato */
+.step.completed {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Hover sugli Step */
+.step:hover {
+    background-color: #0056b3;
+    color: #ffffff;
+}
+.loaderBackground{
+    display: none;
+    place-items: center;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    background-color: #fff;
+    counter-increment: num;
+    height: 350px;
+    width: 100%;
+}
+.loader {
+    width: 16px;
+    aspect-ratio: 1;
+    background: #3FB8AF;
+    box-shadow: 0 -16px #FF3D7F;
+    animation: l6 2s infinite;
+}
+@keyframes l6 {
+    0%   {transform: translate(0   ,0    ) rotate(0)}
+    25%  {transform: translate(0   ,0    ) rotate(90deg)}
+    50%  {transform: translate(100%,-100%) rotate(180deg)}
+    75%  {transform: translate(100%,-100%) rotate(270deg)}
+    100% {transform: translate(0   ,0    ) rotate(360deg)}
 }
 </style>
 <script>
+    let currentQuestionIndex = 0;
 function openNav() {
 	if(document.getElementById("mySidebar").style.width == "250px"){
    document.getElementById("mySidebar").style.width = "0";
@@ -350,52 +512,89 @@ function generateQuiz(){
     $.ajax({
         type: "GET", contentType: "application/json", url: "/generate?rule=palombaro lungo", success: function (a) {
             console.log("SUCCESS : ", a);
-            const quizContainer = document.getElementById('quiz-container');
-
-            a.forEach((item, index) => {
-                const questionCard = document.createElement('div');
-                questionCard.className = 'question-card';
-
-                const questionTitle = document.createElement('h2');
-                questionTitle.textContent = `${index + 1}. ${item.question}`;
-                questionCard.appendChild(questionTitle);
-
-                const optionsList = document.createElement('ul');
-                optionsList.className = 'options-list';
-
-                for (let key in item.options) {
-                    const optionItem = document.createElement('li');
-                    // if (key === item.correct_answer) {
-                    //     optionItem.className = 'correct';
-                    // }
-
-                    const optionLabel = document.createElement('label');
-                    optionLabel.textContent = `${key.toUpperCase()}: ${item.options[key]}`;
-                    optionItem.appendChild(optionLabel);
-                    optionsList.appendChild(optionItem);
-                }
-
-                questionCard.appendChild(optionsList);
-                quizContainer.appendChild(questionCard);
-                const listItems = document.querySelectorAll('.options-list li');
-
-                // Aggiungi un event listener per ogni elemento li
-                listItems.forEach(item => {
-                    item.addEventListener('click', function() {
-                        // Rimuovi la classe 'selected' da tutti gli elementi
-                        listItems.forEach(li => li.classList.remove('selected'));
-
-                        // Aggiungi la classe 'selected' all'elemento cliccato
-                        this.classList.add('selected');
-                    });
-                });
-            });
+            generateTemplate(a);
         }, error: function (a) {
             alert("Error! " + a);
             console.log("ERROR: ", a);
         }
     });
 }
+function generateTemplate(quizData) {
+    const quizContainer = document.getElementById('quiz-container');
+    const summaryList = document.querySelector('.stepper-wrapper');
+
+
+    quizData.forEach((item, index) => {
+        const questionCard = document.createElement('div');
+        questionCard.classList.add('question-card');
+        questionCard.id = item.id;
+        if (index === 0) questionCard.classList.add('active'); // Mostra la prima domanda
+        const questionTitle = document.createElement('h2');
+        questionTitle.textContent = `${index + 1}. ${item.question}`;
+
+        const optionsList = document.createElement('ul');
+        optionsList.classList.add('options-list');
+
+        for (const [key, value] of Object.entries(item.options)) {
+            const optionItem = document.createElement('li');
+
+            const optionInput = document.createElement('input');
+            optionInput.type = 'radio';
+            optionInput.id = `q${index + 1}${key}`;
+            optionInput.name = item.id;
+            optionInput.value = key;
+
+            const optionLabel = document.createElement('label');
+            optionLabel.htmlFor = `q${index + 1}${key}`;
+            optionLabel.textContent = `${key.toUpperCase()}: ${value}`;
+
+            optionItem.appendChild(optionInput);
+            optionItem.appendChild(optionLabel);
+            optionsList.appendChild(optionItem);
+        }
+
+        questionCard.appendChild(questionTitle);
+        questionCard.appendChild(optionsList);
+        quizContainer.appendChild(questionCard);
+
+        // Add summary item
+        const stepItem = document.createElement('div');
+        const stepCounter = document.createElement('div');
+        stepItem.classList.add('stepper-item');
+        stepItem.id = item.id
+        stepCounter.classList.add('step-counter')
+        stepCounter.textContent = index + 1; // Numero della domanda
+        stepCounter.dataset.index = index; // Attribuzione del data-index per riferimento
+        stepItem.appendChild(stepCounter)
+        summaryList.appendChild(stepItem);
+    });
+}
+function showQuestion(index) {
+    const questionCards = document.querySelectorAll('.question-card');
+    questionCards.forEach((card, i) => {
+        card.classList.toggle('active', i === index);
+    });
+
+    document.getElementById('prev-btn').disabled = index === 0;
+    document.getElementById('next-btn').style.display = index === questionCards.length - 1 ? 'none' : 'inline-block';
+    document.getElementById('submit-btn').style.display = index === questionCards.length - 1 ? 'block' : 'none';
+}
+// Event Listener per il pulsante "Indietro"
+document.getElementById('prev-btn').addEventListener('click', () => {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion(currentQuestionIndex);
+    }
+});
+
+// Event Listener per il pulsante "Avanti"
+document.getElementById('next-btn').addEventListener('click', () => {
+    const questionCards = document.querySelectorAll('.question-card');
+    if (currentQuestionIndex < questionCards.length - 1) {
+        currentQuestionIndex++;
+        showQuestion(currentQuestionIndex);
+    }
+});
 </script>
 <script type="text/javascript" th:inline="javascript" >
 
@@ -930,15 +1129,30 @@ function generateQuiz(){
   </div>
 </div>
 <div class="modal fade" id="quizModal" tabindex="-1" aria-labelledby="quizModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="max-width: 850px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="quizModalLabel">Modal title</h5>
+                <h5 class="modal-title" id="quizModalLabel">Quiz</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="quiz-container"></div>
+                <div class="" id="QuizLoaderWrapper">
+                <div class="stepper-wrapper">
+
+                </div>
+                <div id="quiz-container">
+
+                </div>
+                <div class="navigation-buttons">
+                    <div style="display: flex;justify-content: space-between">
+                        <button id="prev-btn" class="btn" disabled>Indietro</button>
+                        <button id="next-btn" class="btn">Avanti</button>
+                    </div>
+                </div>
+                </div>
+                <div class="loaderBackground" id="loaderBackground"><div class="loader"></div></div>
             </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
