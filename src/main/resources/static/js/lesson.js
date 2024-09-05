@@ -60,6 +60,7 @@ function checkQuiz(){
 
         success: function(data) {
             console.log("SUCCESS : ", data);
+            createQuestionTemplate(data);
             document.getElementById('statuss').className="badge bg-success";
             document.getElementById('statuss').innerText="Running";
 
@@ -99,7 +100,76 @@ document.getElementById('next-btn').addEventListener('click', () => {
         showQuestion(currentQuestionIndex);
     }
 });
+const container = document.getElementById('quizModalBody');
 
+// Funzione per creare la visualizzazione delle domande e risposte
+function createQuestionTemplate(questions) {
+    document.getElementById("quizModalBody").innerText="";
+    let score = 0;
+    questions.forEach((item, index) => {
+        // Creazione del contenitore della domanda
+        const questionContainer = document.createElement('div');
+        questionContainer.classList.add('question-container-result');
+
+        // Testo della domanda (dinamico, qui rappresentato da un esempio)
+        const questionText = document.createElement('div');
+        questionText.classList.add('question');
+        questionText.textContent = `Domanda ${index + 1}: ${item.question}`;
+
+        // Creazione del contenitore delle risposte
+        const optionsList = document.createElement('ul');
+        optionsList.classList.add('options');
+
+        for (const [key, value] of Object.entries(item.options)) {
+            const optionItem = document.createElement('li');
+            optionItem.textContent = `${key.toUpperCase()}: ${value}`;
+            optionsList.appendChild(optionItem);
+            if (item.source === item.correct_answer && item.source === key) {
+                // Caso risposta corretta
+                optionItem.classList.add("correct-answer"); // Verde per la risposta corretta data
+                optionItem.style.backgroundColor = "#d4edda"; // Verde chiaro
+            } else if (item.source === key) {
+                // Caso risposta data sbagliata
+                optionItem.classList.add("wrong-answer"); // Rosso per la risposta sbagliata
+                optionItem.style.backgroundColor = "#f8d7da"; // Rosso chiaro
+            } else if (item.correct_answer === key && item.source == null) {
+                optionItem.style.backgroundColor = "#6c757d"; // Verde chiaro per evidenziare la risposta giusta
+
+            }else if (item.correct_answer === key) {
+                // Caso risposta corretta non data
+                optionItem.classList.add("correct-answer"); // Verde per la risposta corretta
+                optionItem.style.backgroundColor = "#c3e6cb"; // Verde chiaro per evidenziare la risposta giusta
+
+            }
+            optionsList.appendChild(optionItem);
+        }
+
+        // Creazione della sezione dei risultati
+        const resultDiv = document.createElement('div');
+        resultDiv.classList.add('result');
+        const correctAnswer = document.createElement('span');
+        correctAnswer.classList.add('correct-answer');
+        correctAnswer.textContent = `Risposta Corretta: ${item.correct_answer})`;
+
+        // Visualizzazione della risposta data
+        const givenAnswer = document.createElement('span');
+        givenAnswer.classList.add(item.source ? 'given-answer' : 'no-answer');
+        givenAnswer.textContent = `Risposta Data: ${item.source ? item.source + ')' : 'Nessuna risposta fornita'}`;
+
+        // Aggiunta delle risposte corrette e date alla sezione dei risultati
+        resultDiv.appendChild(correctAnswer);
+        resultDiv.appendChild(document.createElement('br'));
+        resultDiv.appendChild(givenAnswer);
+
+        // Aggiunta dei componenti al contenitore della domanda
+        questionContainer.appendChild(questionText);
+        questionContainer.appendChild(optionsList);
+        questionContainer.appendChild(resultDiv);
+
+        // Aggiunta della domanda al contenitore principale
+        container.appendChild(questionContainer);
+    });
+}
 
 export function file_upload(){
 	var form = $("#formFileLg")[0].files[0];

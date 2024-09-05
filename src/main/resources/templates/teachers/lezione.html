@@ -487,6 +487,58 @@ textarea {
     75%  {transform: translate(100%,-100%) rotate(270deg)}
     100% {transform: translate(0   ,0    ) rotate(360deg)}
 }
+.question-container-result {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.question {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.options {
+    list-style: none;
+    padding: 0;
+}
+
+.options li {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.options li:hover {
+    background-color: #f0f0f0;
+}
+
+.wrong-answer {
+    color: #dc3545; /* Rosso per la risposta sbagliata */
+    font-weight: bold;
+}
+
+.correct-answer {
+    color: #49ac01; /* Blu per la risposta data */
+    font-weight: bold;
+}
+
+.no-answer {
+    color: #6c757d; /* Grigio per nessuna risposta fornita */
+}
+
+.result {
+    margin-top: 15px;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
 </style>
 <script>
     let currentQuestionIndex = 0;
@@ -569,32 +621,6 @@ function generateTemplate(quizData) {
         summaryList.appendChild(stepItem);
     });
 }
-function showQuestion(index) {
-    const questionCards = document.querySelectorAll('.question-card');
-    questionCards.forEach((card, i) => {
-        card.classList.toggle('active', i === index);
-    });
-
-    document.getElementById('prev-btn').disabled = index === 0;
-    document.getElementById('next-btn').style.display = index === questionCards.length - 1 ? 'none' : 'inline-block';
-    document.getElementById('submit-btn').style.display = index === questionCards.length - 1 ? 'block' : 'none';
-}
-// Event Listener per il pulsante "Indietro"
-document.getElementById('prev-btn').addEventListener('click', () => {
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion(currentQuestionIndex);
-    }
-});
-
-// Event Listener per il pulsante "Avanti"
-document.getElementById('next-btn').addEventListener('click', () => {
-    const questionCards = document.querySelectorAll('.question-card');
-    if (currentQuestionIndex < questionCards.length - 1) {
-        currentQuestionIndex++;
-        showQuestion(currentQuestionIndex);
-    }
-});
 </script>
 <script type="text/javascript" th:inline="javascript" >
 
@@ -1135,7 +1161,7 @@ document.getElementById('next-btn').addEventListener('click', () => {
                 <h5 class="modal-title" id="quizModalLabel">Quiz</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" id="quizModalBody">
                 <div class="" id="QuizLoaderWrapper">
                 <div class="stepper-wrapper">
 

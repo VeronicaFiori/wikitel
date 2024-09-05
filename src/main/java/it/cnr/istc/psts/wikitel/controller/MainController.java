@@ -1105,6 +1105,7 @@ public class MainController {
   @GetMapping("/generate")
   public List<QuizQuestion>  generateQuestion(@RequestParam(value = "rule", required = false) String rule) throws JsonProcessingException {
     List<QuizQuestion>  quizQuestionList = new ArrayList<>();
+    QuizQuestionList quizQuestionListMongo = new QuizQuestionList();
     RuleMongo ruleMongo = this.modelservice.getRuleMongoByTitle(rule);
     String basePrompt = "Create 10 high school - italian level quiz based on the provided text.\n"
             + "You must strictly add here to the following json format without any errors:\n"
@@ -1132,24 +1133,32 @@ public class MainController {
 
     String paragraph = ruleMongo.getPlain_text();
     boolean validResult = true;
-    quizQuestionList =this.quizQuestionService.getQuizQuestionsByRule(Long.valueOf(33));
-//    while (validResult) {
-//      LOG.info("START----------GENERATE QUIZ------------------");
-//      try {
-//        LOG.info("START----------chatBotRest------------------");
-//        ObjectNode jsonObject = chatBotRest(basePrompt, paragraph);
-//        LOG.info("FINISH----------chatBotRest------------------");
-//        LOG.info("START----------Formatting question------------------");
-//        quizQuestionList = getQuestionAnswer(jsonObject.get("choices").get(0).toString());
-//        LOG.info("FINISH----------Formatting question------------------");
-//        validResult = false;
-//      } catch (Exception e) {
-//        LOG.error("------------ERROR RETRY JSON PARSING------------");
-//      }
-//    }
+    int maxRetry = 0;
+    quizQuestionList =this.quizQuestionService.getQuizQuestionsByRule(33L);
+    if(quizQuestionList == null) {
+      while (validResult || maxRetry == 4) {
+        LOG.info("START----------GENERATE QUIZ------------------");
+        try {
+          maxRetry++;
+          LOG.info("START----------chatBotRest------------------");
+          ObjectNode jsonObject = chatBotRest(basePrompt, paragraph);
+          LOG.info("FINISH----------chatBotRest------------------");
+          LOG.info("START----------Formatting question------------------");
+          quizQuestionList = getQuestionAnswer(jsonObject.get("choices").get(0).toString());          LOG.info("FINISH----------Formatting question------------------");
+          validResult = false;
+          quizQuestionListMongo.setRuleId(33L);
+          quizQuestionListMongo.setQuizQuestions(createQuizId(quizQuestionList, String.valueOf(33L)));
+          this.quizQuestionService.save(quizQuestionListMongo);
+        } catch (Exception e) {
+          LOG.error("------------ERROR RETRY JSON PARSING------------");
+          LOG.error("ERRORE", e);
+
+        }
+      }
+    }
     LOG.info("FINISH----------GENERATE QUIZ------------------");
 
-    return createQuizId(quizQuestionList, "33");
+    return quizQuestionList;
   }
 
 
@@ -1329,10 +1338,52 @@ public class MainController {
 //      return "redirect:/userDetails/" + userId;
 //  }
   
-//  @PostMapping("/chekQuiz")
-//  public List<QuizQuestion> checkQuiz(){
-//
-//  }
+  @PostMapping("/chekQuiz")
+  public List<QuizQuestion> checkQuiz(@RequestBody ArrayNode nodes){
+      List<QuizQuestion> resultQuizs = new ArrayList<>();
+    Map<String, List<String>> groupedById = new HashMap<>();
+    Map<String, String> givenAnswers = new HashMap<>();
+    for (JsonNode node : nodes) {
+      String question = node.get("question").asText(); // Ottieni la domanda
+      String value = node.get("value").isNull() ? null : node.get("value").asText(); // Ottieni la risposta
+
+      // Divide la chiave in ID e numero della domanda
+      String[] keyParts = question.split("\\|");
+      String id = keyParts[0]; // Ottieni l'ID
+
+      // Aggiungi la chiave alla lista dell'ID corrispondente
+      groupedById.computeIfAbsent(id, k -> new ArrayList<>()).add(question);
+
+      // Memorizza la risposta fornita
+      givenAnswers.put(question, value);
+    }
+    for (Map.Entry<String, List<String>> entry : groupedById.entrySet()) {
+      String id = entry.getKey();
+      List<String> questionsInMap = entry.getValue();
+      List<QuizQuestion> correctAnswers = this.quizQuestionService.getQuizQuestionsByRule(Long.valueOf(id));
+      System.out.println("Verifica per ID: " + id);
+
+      // Controlla ogni domanda per questo ID
+      for (String questionKey : questionsInMap) {
+        QuizQuestion question = correctAnswers.stream().filter(ans -> ans.getId().equals(questionKey)).findAny().get();
+        String correctAnswer = question.getCorrectAnswer();
+        String givenAnswer = givenAnswers.get(questionKey);
+
+        QuizQuestion resultQuiz = new QuizQuestion();
+        resultQuiz.setId(questionKey);
+        resultQuiz.setCorrectAnswer(correctAnswer);
+        resultQuiz.setSource(givenAnswer);
+        resultQuiz.setQuestion(question.getQuestion());
+        resultQuiz.setOptions(question.getOptions());
+        resultQuizs.add(resultQuiz);
+        // Stampa i risultati
+        //System.out.println("Numero della domanda: " + questionNumber + " - Risposta corretta: " + isCorrect);
+      }
+    }
+
+
+    return resultQuizs;
+  }
   
   
 }

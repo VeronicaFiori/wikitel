@@ -15,8 +15,8 @@ public class QuizQuestionService {
     private QuizQuestionListMongoRepository quizQuestionListMongoRepository;
 
     public List<QuizQuestion> getQuizQuestionsByRule(Long ruleId) {
-        QuizQuestionList quizQuestionListMongo = this.quizQuestionListMongoRepository.findByRuleId(ruleId).orElse(null);
-        return quizQuestionListMongo.getQuizQuestions();
+        QuizQuestionList quizQuestionListMongo = this.quizQuestionListMongoRepository.findById(ruleId).orElse(null);
+        return quizQuestionListMongo != null ? quizQuestionListMongo.getQuizQuestions() : null;
     }
 
     public QuizQuestionList save(QuizQuestionList quizQuestionList) {
