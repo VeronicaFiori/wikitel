@@ -83,23 +83,24 @@ function updateProgress(currentStep) {
     });
 
 }
-
+if (document.getElementById('prev-btn') != null && document.getElementById('next-btn') != null) {
 // Event Listener per il pulsante "Indietro"
-document.getElementById('prev-btn').addEventListener('click', () => {
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion(currentQuestionIndex);
-    }
-});
+    document.getElementById('prev-btn').addEventListener('click', () => {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            showQuestion(currentQuestionIndex);
+        }
+    });
 
 // Event Listener per il pulsante "Avanti"
-document.getElementById('next-btn').addEventListener('click', () => {
-    const questionCards = document.querySelectorAll('.question-card');
-    if (currentQuestionIndex < questionCards.length - 1) {
-        currentQuestionIndex++;
-        showQuestion(currentQuestionIndex);
-    }
-});
+    document.getElementById('next-btn').addEventListener('click', () => {
+        const questionCards = document.querySelectorAll('.question-card');
+        if (currentQuestionIndex < questionCards.length - 1) {
+            currentQuestionIndex++;
+            showQuestion(currentQuestionIndex);
+        }
+    });
+}
 const container = document.getElementById('quizModalBody');
 
 // Funzione per creare la visualizzazione delle domande e risposte

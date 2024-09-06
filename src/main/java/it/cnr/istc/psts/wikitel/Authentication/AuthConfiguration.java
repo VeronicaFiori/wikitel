@@ -1,44 +1,33 @@
 package it.cnr.istc.psts.wikitel.Authentication;
 
-import static it.cnr.istc.psts.wikitel.db.UserEntity.STUDENT_ROLE;
-import static it.cnr.istc.psts.wikitel.db.UserEntity.TEACHER_ROLE;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
+import it.cnr.istc.psts.wikitel.controller.UserController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.messaging.core.MessageSendingOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.socket.WebSocketSession;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import it.cnr.istc.psts.WikitelNewApplication;
-import it.cnr.istc.psts.wikitel.Service.UserService;
-import it.cnr.istc.psts.wikitel.controller.MainController;
-import it.cnr.istc.psts.wikitel.controller.UserController;
-import it.cnr.istc.psts.wikitel.controller.pageController;
+import static it.cnr.istc.psts.wikitel.db.UserEntity.STUDENT_ROLE;
+import static it.cnr.istc.psts.wikitel.db.UserEntity.TEACHER_ROLE;
 
 /**
  * The AuthConfiguration is a Spring Security Configuration.
@@ -100,7 +89,6 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 					@Override
 					public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 							Authentication authentication) throws IOException, ServletException {
-						System.out.println("prova253");
 					response.sendRedirect("/default");
 						
 					}
