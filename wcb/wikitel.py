@@ -24,7 +24,7 @@ wikipedia.set_lang("it")
 nlp = it_core_news_sm.load()
 
 stop_words = set(stopwords.words("italian"))
-stop_words.update([".", ":", ",", ";", "-", "_", "'", "", "(", ")", "/", "!", "?"])
+stop_words.update([".", ":", ",", ";", "-", "_", "'", "", "/", "!", "?"])
 
 target_categories = {
     "Categoria:Archeologia",
@@ -96,6 +96,8 @@ class WikiTEL(Resource):
         try:
             wiki_page = wiki.page(page_title)
             ny = wikipedia.page(page_title)
+
+            # Se non esiste pagina
             if not wiki_page.exists():
                 suggestions = wikipedia.suggest(page_title)
                 search_results = wikipedia.search(page_title, results=5)
@@ -105,6 +107,7 @@ class WikiTEL(Resource):
                     "maybe": search_results,
                 }
                 return response_data
+
             url = wiki_page.fullurl
             categories = set()
             preconditions = []
