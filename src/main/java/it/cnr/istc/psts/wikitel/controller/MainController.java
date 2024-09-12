@@ -1134,9 +1134,9 @@ public class MainController {
     String paragraph = ruleMongo.getPlain_text();
     boolean validResult = true;
     int maxRetry = 0;
-    quizQuestionList =this.quizQuestionService.getQuizQuestionsByRule(33L);
+    quizQuestionList =this.quizQuestionService.getQuizQuestionsByRule(32L);
     if(quizQuestionList == null) {
-      while (validResult || maxRetry == 4) {
+      while (validResult && maxRetry == 4) {
         LOG.info("START----------GENERATE QUIZ------------------");
         try {
           maxRetry++;
@@ -1144,7 +1144,8 @@ public class MainController {
           ObjectNode jsonObject = chatBotRest(basePrompt, paragraph);
           LOG.info("FINISH----------chatBotRest------------------");
           LOG.info("START----------Formatting question------------------");
-          quizQuestionList = getQuestionAnswer(jsonObject.get("choices").get(0).toString());          LOG.info("FINISH----------Formatting question------------------");
+          quizQuestionList = getQuestionAnswer(jsonObject.get("choices").get(0).toString());
+          LOG.info("FINISH----------Formatting question------------------");
           validResult = false;
           quizQuestionListMongo.setRuleId(33L);
           quizQuestionListMongo.setQuizQuestions(createQuizId(quizQuestionList, String.valueOf(33L)));
@@ -1168,9 +1169,10 @@ public class MainController {
     List<QuizQuestion> questionsanswer = new ArrayList<QuizQuestion>();
     RuleMongo ruleMongo = this.modelservice.getRuleMongoByTitle(ruleName);
     String basePrompt = "Create 10 high school - italian level quiz based on the provided text.\n"
-            + "You must strictly add here to the json following format without any errors:\n"
+            + "You must strictly add here to the following json format without any errors:\n"
             +"[\n"
             + "{\n"
+            + "    \"id\": \"*[ Insert id the index of question]*\",\n"
             + "    \"question\": \"*[ Insert the question ]*\",\n"
             + "    \"options\": {\n"
             + "        \"a\": \"*[ Option A ]*\",\n"
