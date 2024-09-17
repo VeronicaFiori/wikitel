@@ -63,18 +63,18 @@ public class ModelService {
 			Optional<RuleMongo> result  = this.rulemongorep.findByTitle(id);
 			return result.orElse(null);
 		}
+
+		public RuleMongo getRuleMongoById(Long id) {
+			Optional<RuleMongo> result  = this.rulemongorep.findById(id);
+			return result.orElse(null);
+		}
 	 
 	 @Transactional
 	 public List<RuleMongo> getmongotopics(String id) {
 			List<RuleMongo> result  =  this.rulemongorep.findtopics(id);
 			return result;
 		}
-	 
-	 @Transactional
-		public RuleMongo getrulemongo(String id) {
-			Optional<RuleMongo> result  = this.rulemongorep.findById(id);
-			return result.orElse(null);
-		}
+
 		
 	
 	@Transactional

@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @Document("QuizQuestionList")
 public class QuizQuestionList {
-    @Field("_Id")
+    @Field("_id")
     private Long ruleId;
 
     private List<QuizQuestion> quizQuestions;

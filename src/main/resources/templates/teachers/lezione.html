@@ -562,7 +562,7 @@ function wikilink(a){
 }
 function generateQuiz(){
     $.ajax({
-        type: "GET", contentType: "application/json", url: "/generate?rule=palombaro lungo", success: function (a) {
+        type: "GET", contentType: "application/json", url: "/generate?lesson=" + document.getElementById("lesson_id").value, success: function (a) {
             console.log("SUCCESS : ", a);
             generateTemplate(a);
         }, error: function (a) {
@@ -852,7 +852,7 @@ function generateTemplate(quizData) {
 
 <body>
 <div hidden="true" id="nameid" th:value="${user.id}"></div>
-<div id="lesson_id" th:value="${lezione.id}" hidden></div>
+<input type="hidden" id="lesson_id" th:value="${lezione.id}" >
 <nav class="navbar navbar-expand-lg navbar-light bg-light" style="z-index: 1030;padding: 0 15px;">
 	<span style="font-size:25px;cursor:pointer;margin-right: 2%;" onclick="openNav()"><i class="fas fa-bars"></i></span>
   <a class="navbar-brand" href="/default"><img src="/images/wikitel.png" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy">

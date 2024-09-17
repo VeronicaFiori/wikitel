@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface RuleMongoRepository extends MongoRepository<RuleMongo, String>{
+public interface RuleMongoRepository extends MongoRepository<RuleMongo, Long>{
 	
 	Optional<RuleMongo> findByTitle(String name);
 	

@@ -13,7 +13,7 @@ public class RuleMongo {
 	
 	
 	@Id
-	private String id;
+	private Long id;
 	
 	private String title;
 	

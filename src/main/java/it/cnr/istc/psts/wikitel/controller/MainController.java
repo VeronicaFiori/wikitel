@@ -802,12 +802,13 @@ public class MainController {
       }
       this.ruleservice.saverule(effect_entity);
     }
-    if (bool) {
-      rule.setName(node.get("rule_name").asText());
-      rulemongo.setTitle(name);;
-      rulemongorep.save(rulemongo);
-    }
     this.ruleservice.saverule(rule);
+      if (bool) {
+        rule.setName(node.get("rule_name").asText());
+        rulemongo.setTitle(name);;
+        rulemongo.setId(rule.getId());
+        rulemongorep.save(rulemongo);
+      }
     System.out.println(model.getRules());
     model.getRules().add(rule);
     System.out.println("SONOQUIII");
@@ -1103,10 +1104,21 @@ public class MainController {
   }
 
   @GetMapping("/generate")
-  public List<QuizQuestion>  generateQuestion(@RequestParam(value = "rule", required = false) String rule) throws JsonProcessingException {
+  public List<QuizQuestion>  generateQuestion(@RequestParam(value = "lesson", required = false) Long lessonId) throws JsonProcessingException {
+    LessonEntity lesson = this.lessonservice.lezionePerId(lessonId);
+    List<QuizQuestion> quizQuestionList = new ArrayList<>();
+    for(RuleEntity  rule: lesson.getGoals()){
+      quizQuestionList.addAll(getQuizQuestionList(this.modelservice.getRuleMongoById(rule.getId())));
+      LOG.info("FINISH----------GENERATE QUIZ FOR RULE : " + rule.getId() + "------------------");
+    }
+    LOG.info("FINISH----------GENERATE ALL QUIZ------------------");
+
+    return shuffleList(quizQuestionList, 20);
+  }
+
+  private List<QuizQuestion> getQuizQuestionList(RuleMongo ruleMongo) {
     List<QuizQuestion>  quizQuestionList = new ArrayList<>();
     QuizQuestionList quizQuestionListMongo = new QuizQuestionList();
-    RuleMongo ruleMongo = this.modelservice.getRuleMongoByTitle(rule);
     String basePrompt = "Create 10 high school - italian level quiz based on the provided text.\n"
             + "You must strictly add here to the following json format without any errors:\n"
             +"[\n"
@@ -1134,7 +1146,7 @@ public class MainController {
     String paragraph = ruleMongo.getPlain_text();
     boolean validResult = true;
     int maxRetry = 0;
-    quizQuestionList =this.quizQuestionService.getQuizQuestionsByRule(32L);
+    quizQuestionList =this.quizQuestionService.getQuizQuestionsByRule(ruleMongo.getId());
     if(quizQuestionList == null) {
       while (validResult && maxRetry == 4) {
         LOG.info("START----------GENERATE QUIZ------------------");
@@ -1147,8 +1159,8 @@ public class MainController {
           quizQuestionList = getQuestionAnswer(jsonObject.get("choices").get(0).toString());
           LOG.info("FINISH----------Formatting question------------------");
           validResult = false;
-          quizQuestionListMongo.setRuleId(33L);
-          quizQuestionListMongo.setQuizQuestions(createQuizId(quizQuestionList, String.valueOf(33L)));
+          quizQuestionListMongo.setRuleId(ruleMongo.getId());
+          quizQuestionListMongo.setQuizQuestions(createQuizId(quizQuestionList, String.valueOf(ruleMongo.getId())));
           this.quizQuestionService.save(quizQuestionListMongo);
         } catch (Exception e) {
           LOG.error("------------ERROR RETRY JSON PARSING------------");
@@ -1157,12 +1169,15 @@ public class MainController {
         }
       }
     }
-    LOG.info("FINISH----------GENERATE QUIZ------------------");
-
     return quizQuestionList;
   }
+  public static List<QuizQuestion> shuffleList(List<QuizQuestion> lista, int numeroElementi) {
+    // Mescola la lista
+    Collections.shuffle(lista);
 
-
+    // Restituisce i primi numeroElementi elementi
+    return lista.subList(0, numeroElementi);
+  }
 
   public QuizQuestionList  generateQuestion(String ruleName, Long ruleId) throws JsonProcessingException {
     QuizQuestionList quizQuestionList = new QuizQuestionList();
