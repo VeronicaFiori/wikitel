@@ -1112,7 +1112,9 @@ public class MainController {
       LOG.info("FINISH----------GENERATE QUIZ FOR RULE : " + rule.getId() + "------------------");
     }
     LOG.info("FINISH----------GENERATE ALL QUIZ------------------");
-
+    if(quizQuestionList.size() < 20){
+      return shuffleList(quizQuestionList, quizQuestionList.size());
+    }
     return shuffleList(quizQuestionList, 20);
   }
 
