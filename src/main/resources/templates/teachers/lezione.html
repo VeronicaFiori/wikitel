@@ -738,6 +738,9 @@ function generateTemplate(quizData) {
 
             console.log(timelineItems);
             console.log(timelineNames);
+            
+            var goalsl2=goalsl.filter(goal => timelineNames.includes(goal.name));
+            console.log("oh2",goalsl2);
 
             function sortGoalsByList(goalsl, timelineNames) {
                 return goalsl.sort((a, b) => {
@@ -746,10 +749,10 @@ function generateTemplate(quizData) {
             }
 
             // Ordinamento di goals
-            goalsl = sortGoalsByList(goalsl, timelineNames);
-            console.log(goalsl);
+            goalsl2 = sortGoalsByList(goalsl2, timelineNames);
+            console.log(goalsl2);
 
-            var currentGoal = goalsl[currentIndex];
+            var currentGoal = goalsl2[currentIndex];
             var a = currentGoal.name;
             var wiki = /*[[${wiki}]]*/ 'c';
             var web = /*[[${web}]]*/ 'c';
@@ -763,7 +766,7 @@ function generateTemplate(quizData) {
                 var srcFile = currentGoal.src;
                 var srcNameFile = srcFile.split('\\').pop().split('/').pop();
                 var index = 0;
-                while (index < goalsl.length) {
+                while (index < goalsl2.length) {
                     var namepdf = filepdf[index].name;
                     if (namepdf === srcNameFile) {
                         var fileUrl = '/RuleEntity/' + namepdf;
@@ -784,9 +787,25 @@ function generateTemplate(quizData) {
     }
 
     function nextLesson() {
-        if (currentIndex < goalsl.length) {
+		
+		var timelineItems = document.querySelectorAll('#lista_obiettivi li');
+        var timelineNames = Array.from(timelineItems).map(item => item.textContent.trim());
+           
+		var goalsl2=goalsl.filter(goal => timelineNames.includes(goal.name));
+        console.log("oh2",goalsl2);
+            
+        function sortGoalsByList(goalsl, timelineNames) {
+                return goalsl.sort((a, b) => {
+                   return timelineNames.indexOf(a.name) - timelineNames.indexOf(b.name);
+              });
+          }
+       goalsl2 = sortGoalsByList(goalsl2, timelineNames);   //M
+       console.log("arg",goalsl2);    
+       var totLength = goalsl2.reduce((acc, goal) => acc + goal.length, 0);
+       
+        if (currentIndex < goalsl2.length) {
             var elapsedTime = (new Date().getTime() - startTime) / 1000;
-            var requiredTime = goalsl[currentIndex].length / 2;
+            var requiredTime = goalsl2[currentIndex].length / 2;
 
             if (elapsedTime < requiredTime) {
                 var proceed = confirm("Sei sicuro che vuoi già andare avanti?");
@@ -795,7 +814,7 @@ function generateTemplate(quizData) {
                 }
             }
 
-            currentLength += goalsl[currentIndex].length;
+            currentLength += goalsl2[currentIndex].length;
             percentage = (currentLength / totLength) * 100;
             console.log("percentuale",percentage);
 
@@ -803,13 +822,13 @@ function generateTemplate(quizData) {
             updateProgressBar(percentage);
             currentIndex++;
 
-            if (currentIndex < goalsl.length) {
+            if (currentIndex < goalsl2.length) {
                 loadCurrentGoal();
 
             }
         }
 
-        if (currentIndex >= goalsl.length) {
+        if (currentIndex >= goalsl2.length) {
             var nextButton = document.getElementById('nextButton');
             nextButton.innerText = 'Close';
             nextButton.setAttribute('data-bs-dismiss', 'modal');
