@@ -738,7 +738,7 @@ function generateTemplate(quizData) {
 
             console.log(timelineItems);
             console.log(timelineNames);
-            
+            console.log("goalsl",goalsl);
             var goalsl2=goalsl.filter(goal => timelineNames.includes(goal.name));
             console.log("oh2",goalsl2);
 
@@ -937,7 +937,7 @@ function generateTemplate(quizData) {
                     <div class="mr-auto">
                         <div class="page-context-header "><div class="page-header-headings "><h1 th:text="'AA'+${anno} + ' - '+ ${lezione.name} + ' - ' + ${lezione.id} + ' (' + ${lezione.teacher.first_name} + ' ' + ${lezione.teacher.last_name} + ')'"></h1></div></div>
                     </div>   
-                    <a class="down tooltips" th:href="@{'/riddle/' + ${lezione.id}}" id="download"><span class="tooltiptext">Scarica il file riddle della lezione</span><span><i class="fas fa-download"></i></span></a>   
+                <!----   <a class="down tooltips" th:href="@{'/riddle/' + ${lezione.id}}" id="download"><span class="tooltiptext">Scarica il file riddle della lezione</span><span><i class="fas fa-download"></i></span></a>   -->
                                 
                 </div>    
                   	<section th:if="${role}=='controller'">
@@ -1013,7 +1013,7 @@ function generateTemplate(quizData) {
   </div>
          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quizModal">Quiz</button>
 
-  <button type="button" class="btn btn-primary" th:if="${roles}=='STUDENT'" data-bs-toggle="modal" data-bs-target="#stimulo">
+<!--  <button type="button" class="btn btn-primary" th:if="${roles}=='STUDENT'" data-bs-toggle="modal" data-bs-target="#stimulo"> -->
  <!-- onclick="wikilink(name)"-->
 
 

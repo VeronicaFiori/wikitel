@@ -8,8 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -29,7 +31,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 import it.cnr.istc.psts.Websocket.Sending;
 import it.cnr.istc.psts.wikitel.MongoRepository.RuleMongoRepository;
@@ -293,7 +294,16 @@ public class pageController {
 	
 		/**/
 		LessonManager lessonManager = new LessonManager(lezione, send, modelservice, userservice, null);
-		List<RuleEntity> goals = lessonManager.getArgomentiPerStudenti();
+//		List<RuleEntity> goals = lessonManager.getArgomentiPerStudenti();
+//		model.addAttribute("goalsl",goals);
+		
+		Set<RuleEntity> goals = new HashSet<>();
+		for( RuleEntity r : lezione.getGoals()){
+			goals.add(r);
+			for (RuleEntity pre :r.getPreconditions()){
+				goals.add(pre);
+			}
+		}
 		model.addAttribute("goalsl",goals);
 		
 		List<String> wiki = new ArrayList<>();

@@ -46,12 +46,12 @@
         <p>Il tuo account è stato creato con successo</p>
         <p>Effettua ora il login per accedere al sistema</p>
       </div>
-      <div class="card" th:unless="${complete}">
+      <div class="card"  th:unless="${complete}">
       <div style="border-radius:200px; height:200px; width:200px; background: #F8FAF5; margin:0 auto;">
-        <i class="checkmark">✓</i>
+    <i class="crossmark" style="font-size: 100px; color: #D9534F;">&#10060;</i> <!-- Icona "X" rossa -->
       </div>
-        <h1>Failed</h1> 
-        <p>Il tuo account non stato Confermato oopure il link non è valido</p>
+        <h1 th:text="Failed" style=" color: #D9534F;">Failed</h1> 
+        <p>Il tuo account non stato Confermato oppure il link non è valido</p>
       </div>
     </body>
 </html>
