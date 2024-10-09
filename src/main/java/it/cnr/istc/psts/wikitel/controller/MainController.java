@@ -20,6 +20,7 @@ import it.cnr.istc.psts.wikitel.db.*;
 import it.cnr.psts.wikitel.API.Lesson.LessonState;
 import it.cnr.psts.wikitel.API.Message;
 import net.bytebuddy.utility.RandomString;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1358,7 +1359,8 @@ public class MainController {
 //  }
   
   @PostMapping("/chekQuiz")
-  public List<QuizQuestion> checkQuiz(@RequestBody ArrayNode nodes){
+  public QuizQuestionList checkQuiz(@RequestBody ArrayNode nodes){
+    QuizQuestionList quizQuestionList = new QuizQuestionList();
       List<QuizQuestion> resultQuizs = new ArrayList<>();
     Map<String, List<String>> groupedById = new HashMap<>();
     Map<String, String> givenAnswers = new HashMap<>();
@@ -1376,6 +1378,7 @@ public class MainController {
       // Memorizza la risposta fornita
       givenAnswers.put(question, value);
     }
+    long numberCorectQuestion = 0L;
     for (Map.Entry<String, List<String>> entry : groupedById.entrySet()) {
       String id = entry.getKey();
       List<String> questionsInMap = entry.getValue();
@@ -1385,23 +1388,24 @@ public class MainController {
       // Controlla ogni domanda per questo ID
       for (String questionKey : questionsInMap) {
         QuizQuestion question = correctAnswers.stream().filter(ans -> ans.getId().equals(questionKey)).findAny().get();
+        QuizQuestion resultQuiz = new QuizQuestion();
         String correctAnswer = question.getCorrectAnswer();
         String givenAnswer = givenAnswers.get(questionKey);
-
-        QuizQuestion resultQuiz = new QuizQuestion();
+        if (StringUtils.isNotEmpty(correctAnswer) && StringUtils.isNotEmpty(givenAnswer) && (correctAnswer.charAt(0) == givenAnswer.charAt(0))) {
+          numberCorectQuestion++;
+          resultQuiz.setCorrectAnswer(String.valueOf(correctAnswer.charAt(0)));
+        }
         resultQuiz.setId(questionKey);
-        resultQuiz.setCorrectAnswer(correctAnswer);
         resultQuiz.setSource(givenAnswer);
         resultQuiz.setQuestion(question.getQuestion());
         resultQuiz.setOptions(question.getOptions());
         resultQuizs.add(resultQuiz);
-        // Stampa i risultati
-        //System.out.println("Numero della domanda: " + questionNumber + " - Risposta corretta: " + isCorrect);
       }
     }
+    quizQuestionList.setQuizQuestions(resultQuizs);
+    quizQuestionList.setRuleId(numberCorectQuestion);
 
-
-    return resultQuizs;
+    return quizQuestionList;
   }
   
   

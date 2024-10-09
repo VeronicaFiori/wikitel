@@ -48,6 +48,29 @@ function getAllSelectedAnswers() {
 
     return selectedAnswers;
 }
+function showResult(score, total) {
+    const resultDiv = document.getElementById('resultTest');
+    document.getElementById('quizResult').style.display = 'block';
+    const isPassed = score >= total / 2;
+
+    if (isPassed) {
+        resultDiv.innerHTML = `
+            <div class="result success">
+                <h2>Test Superato!</h2>
+                <p>Congratulazioni! Hai raggiunto il punteggio necessario.</p>
+                <p><strong>Punteggio: ${score} / ${total}</strong></p>
+            </div>
+        `;
+    } else {
+        resultDiv.innerHTML = `
+            <div class="result failure">
+                <h2>Test Non Superato</h2>
+                <p>Mi dispiace, non hai raggiunto il punteggio necessario.</p>
+                <p><strong>Punteggio: ${score} / ${total}</strong></p>
+            </div>
+        `;
+    }
+}
 
 function checkQuiz(){
     document.getElementById("QuizLoaderWrapper").style.display = "none";
@@ -60,7 +83,8 @@ function checkQuiz(){
 
         success: function(data) {
             console.log("SUCCESS : ", data);
-            createQuestionTemplate(data);
+            createQuestionTemplate(data.quizQuestions);
+            showResult(data.ruleId, data.quizQuestions.length);
             document.getElementById('statuss').className="badge bg-success";
             document.getElementById('statuss').innerText="Running";
 
